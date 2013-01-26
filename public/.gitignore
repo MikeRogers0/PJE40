@@ -1,0 +1,7 @@
+# http://www.yiiframework.com/wiki/307/starting-your-yii-project-reference-guide-with-git-vcs-in-linux/#hh6
+
+assets/*
+!assets/.gitignore
+protected/runtime/*
+!protected/runtime/.gitignore
+protected/data/*.db
