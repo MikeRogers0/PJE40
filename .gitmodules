@@ -1,0 +1,3 @@
+[submodule "public/protected/modules/user"]
+	path = public/protected/modules/user
+	url = git@github.com:mishamx/yii-user.git
