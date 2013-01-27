@@ -8,5 +8,5 @@ $this->breadcrumbs=array(
 ?>
 <h1>About</h1>
 
-<p>This is a "static" page. You may change the content of this page
-by updating the file <code><?php echo __FILE__; ?></code>.</p>
+<p>This is a final year engineering project for the PJE40 unit by 447955 at Portsmouth University.</p>
+<p>The aim of this project is to distribute data processing to the browser via HTML5 technologies. If you have any questions please use the <?php echo CHtml::link('contact', array('/site/contact')); ?> page.</p>

@@ -3,13 +3,13 @@
 /* @var $model ContactForm */
 /* @var $form CActiveForm */
 
-$this->pageTitle=Yii::app()->name . ' - Contact Us';
+$this->pageTitle=Yii::app()->name . ' - Contact';
 $this->breadcrumbs=array(
 	'Contact',
 );
 ?>
 
-<h1>Contact Us</h1>
+<h1>Contact</h1>
 
 <?php if(Yii::app()->user->hasFlash('contact')): ?>
 
@@ -20,7 +20,7 @@ $this->breadcrumbs=array(
 <?php else: ?>
 
 <p>
-If you have business inquiries or other questions, please fill out the following form to contact us. Thank you.
+If you have inquiries or other questions, please fill out the following form to contact me. Thank you.
 </p>
 
 <div class="form">
