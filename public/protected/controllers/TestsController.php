@@ -28,7 +28,7 @@ class TestsController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
+				'actions'=>array('index','view','iframe'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -54,6 +54,17 @@ class TestsController extends Controller
 		$this->render('view',array(
 			'model'=>$this->loadModel($id),
 		));
+	}
+	
+	/**
+	 * The page which will be embed accross the WWW>
+	 * @param integer $id the ID of the model to be displayed
+	 */
+	public function actionIframe()
+	{
+		// Just reset the layout to be minial.
+		$this->layout='//layouts/min';
+		$this->render('iframe');
 	}
 
 	/**
