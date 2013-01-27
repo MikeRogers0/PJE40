@@ -42,6 +42,7 @@ class Tests extends CActiveRecord
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, name, crunch_file, display_file, crunches, last_crunched, completed, tbl_users_id', 'safe', 'on'=>'search'),
+			array('last_crunched','default', 'value'=>new CDbExpression('NOW()'), 'setOnEmpty'=>false,'on'=>'update'),
 		);
 	}
 

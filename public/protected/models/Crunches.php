@@ -38,6 +38,8 @@ class Crunches extends CActiveRecord
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, tbl_tests_id, ip, last_activity, result', 'safe', 'on'=>'search'),
+			array('last_activity','default', 'value'=>new CDbExpression('NOW()'), 'setOnEmpty'=>false,'on'=>'update'),
+			array('last_activity','default', 'value'=>new CDbExpression('NOW()'), 'setOnEmpty'=>false,'on'=>'insert'),
 		);
 	}
 
@@ -105,5 +107,15 @@ class Crunches extends CActiveRecord
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+	
+	
+	/**
+	 * Updates it's parent model to reflect one of it's children has updated.
+	 */
+	protected function afterSave(){
+		parent::afterSave();
+		
+		$this->tblTests->save();
 	}
 }
