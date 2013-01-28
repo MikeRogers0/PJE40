@@ -118,4 +118,17 @@ class Tests extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+	
+	/**
+	 * Gets a "random/next to queued" test due for processing.  
+	 */
+	 public static function freshModel(){
+		$criteria=new CDbCriteria;
+		//$criteria->select='title';  // only select the 'title' column
+		$criteria->condition='completed=:completed';
+		$criteria->params=array(':completed'=>0);
+		$criteria->order='last_crunched DESC';
+		
+		return Tests::model()->find($criteria);
+	 }
 }
