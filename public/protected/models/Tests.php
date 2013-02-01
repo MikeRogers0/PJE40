@@ -8,13 +8,13 @@
  * @property string $name
  * @property string $crunch_file
  * @property string $display_file
- * @property integer $crunches
+ * @property integer $crunches_required
  * @property string $last_crunched
  * @property integer $completed
  * @property integer $tbl_users_id
  *
  * The followings are the available model relations:
- * @property Crunches[] $crunches0
+ * @property Crunches[] $crunches
  * @property Users $tblUsers
  */
 class Tests extends CActiveRecord
@@ -36,12 +36,12 @@ class Tests extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('name, crunch_file, tbl_users_id', 'required'),
-			array('crunches, completed, tbl_users_id', 'numerical', 'integerOnly'=>true),
+			array('crunches_required, completed, tbl_users_id', 'numerical', 'integerOnly'=>true),
 			array('name, crunch_file, display_file', 'length', 'max'=>45),
 			array('last_crunched', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, name, crunch_file, display_file, crunches, last_crunched, completed, tbl_users_id', 'safe', 'on'=>'search'),
+			array('id, name, crunch_file, display_file, crunches_required, last_crunched, completed, tbl_users_id', 'safe', 'on'=>'search'),
 			array('last_crunched','default', 'value'=>new CDbExpression('NOW()'), 'setOnEmpty'=>false,'on'=>'update'),
 		);
 	}
@@ -54,7 +54,7 @@ class Tests extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'crunches0' => array(self::HAS_MANY, 'Crunches', 'tbl_tests_id'),
+			'crunches' => array(self::HAS_MANY, 'Crunches', 'tbl_tests_id'),
 			'tblUsers' => array(self::BELONGS_TO, 'Users', 'tbl_users_id'),
 		);
 	}
@@ -69,7 +69,7 @@ class Tests extends CActiveRecord
 			'name' => 'Name',
 			'crunch_file' => 'Crunch File',
 			'display_file' => 'Display File',
-			'crunches' => 'Crunches',
+			'crunches_required' => 'Crunches Required',
 			'last_crunched' => 'Last Crunched',
 			'completed' => 'Completed',
 			'tbl_users_id' => 'Tbl Users',
@@ -98,7 +98,7 @@ class Tests extends CActiveRecord
 		$criteria->compare('name',$this->name,true);
 		$criteria->compare('crunch_file',$this->crunch_file,true);
 		$criteria->compare('display_file',$this->display_file,true);
-		$criteria->compare('crunches',$this->crunches);
+		$criteria->compare('crunches_required',$this->crunches_required);
 		$criteria->compare('last_crunched',$this->last_crunched,true);
 		$criteria->compare('completed',$this->completed);
 		$criteria->compare('tbl_users_id',$this->tbl_users_id);
@@ -120,9 +120,18 @@ class Tests extends CActiveRecord
 	}
 	
 	/**
+	 * Updates the completed field.
+	 */
+	protected function afterSave(){
+		parent::afterSave();
+		
+		
+	}
+	
+	/**
 	 * Gets a "random/next to queued" test due for processing.  
 	 */
-	 public static function freshModel(){
+	public static function freshModel(){
 		$criteria=new CDbCriteria;
 		//$criteria->select='title';  // only select the 'title' column
 		$criteria->condition='completed=:completed';

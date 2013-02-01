@@ -21,8 +21,8 @@
 	<?php echo CHtml::encode($data->display_file); ?>
 	<br />
 
-	<b><?php echo CHtml::encode($data->getAttributeLabel('crunches')); ?>:</b>
-	<?php echo CHtml::encode($data->crunches); ?>
+	<b><?php echo CHtml::encode($data->getAttributeLabel('crunches_required')); ?>:</b>
+	<?php echo CHtml::encode($data->crunches_required); ?>
 	<br />
 
 	<b><?php echo CHtml::encode($data->getAttributeLabel('last_crunched')); ?>:</b>

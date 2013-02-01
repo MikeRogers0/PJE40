@@ -32,8 +32,8 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'crunches'); ?>
-		<?php echo $form->textField($model,'crunches'); ?>
+		<?php echo $form->label($model,'crunches_required'); ?>
+		<?php echo $form->textField($model,'crunches_required'); ?>
 	</div>
 
 	<div class="row">

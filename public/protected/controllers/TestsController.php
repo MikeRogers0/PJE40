@@ -73,12 +73,19 @@ class TestsController extends Controller
 		// load a random model which is incomplete.
 		$this->layout='//layouts/empty';
 		
-		$model = Tests::freshModel();
+		// Load up the models
+		$tests = Tests::freshModel();
+		$crunch = Crunches::newModel();
+		
+		// Make the json object
+		$json['test'] = $tests->attributes;
+		$json['crunch'] = $crunch->attributes;
 		
 		// convert the $model into some json which is nicer for Javascript to use.
+		$json = json_encode($json);
 		
 		$this->render('ajax',array(
-			'json'=>,
+			'json'=>$json,
 		));
 	}
 

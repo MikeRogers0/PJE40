@@ -25,7 +25,7 @@ $this->menu=array(
 		'name',
 		'crunch_file',
 		'display_file',
-		'crunches',
+		'crunches_required',
 		'last_crunched',
 		'completed',
 		'tbl_users_id',

@@ -34,9 +34,9 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'crunches'); ?>
-		<?php echo $form->textField($model,'crunches'); ?>
-		<?php echo $form->error($model,'crunches'); ?>
+		<?php echo $form->labelEx($model,'crunches_required'); ?>
+		<?php echo $form->textField($model,'crunches_required'); ?>
+		<?php echo $form->error($model,'crunches_required'); ?>
 	</div>
 
 	<div class="row">

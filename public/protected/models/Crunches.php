@@ -6,9 +6,11 @@
  * The followings are the available columns in table '{{crunches}}':
  * @property integer $id
  * @property integer $tbl_tests_id
- * @property string $ip
+ * @property string $authkey
  * @property string $last_activity
  * @property string $result
+ * @property integer $completed
+ * @property integer $crunch_number
  *
  * The followings are the available model relations:
  * @property Tests $tblTests
@@ -32,12 +34,12 @@ class Crunches extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('tbl_tests_id', 'required'),
-			array('tbl_tests_id', 'numerical', 'integerOnly'=>true),
-			array('ip', 'length', 'max'=>45),
+			array('tbl_tests_id, completed, crunch_number', 'numerical', 'integerOnly'=>true),
+			array('authkey', 'length', 'max'=>45),
 			array('last_activity, result', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, tbl_tests_id, ip, last_activity, result', 'safe', 'on'=>'search'),
+			array('id, tbl_tests_id, authkey, last_activity, result, crunch_number, completed', 'safe', 'on'=>'search'),
 			array('last_activity','default', 'value'=>new CDbExpression('NOW()'), 'setOnEmpty'=>false,'on'=>'update'),
 			array('last_activity','default', 'value'=>new CDbExpression('NOW()'), 'setOnEmpty'=>false,'on'=>'insert'),
 		);
@@ -63,9 +65,11 @@ class Crunches extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'tbl_tests_id' => 'Tbl Tests',
-			'ip' => 'Ip',
+			'authkey' => 'Authkey',
 			'last_activity' => 'Last Activity',
 			'result' => 'Result',
+			'completed' => 'Completed',
+			'crunch_number' => 'Crunch Number',
 		);
 	}
 
@@ -89,9 +93,11 @@ class Crunches extends CActiveRecord
 
 		$criteria->compare('id',$this->id);
 		$criteria->compare('tbl_tests_id',$this->tbl_tests_id);
-		$criteria->compare('ip',$this->ip,true);
+		$criteria->compare('authkey',$this->authkey,true);
 		$criteria->compare('last_activity',$this->last_activity,true);
 		$criteria->compare('result',$this->result,true);
+		$criteria->compare('completed',$this->completed);
+		$criteria->compare('crunch_number',$this->crunch_number);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -109,7 +115,6 @@ class Crunches extends CActiveRecord
 		return parent::model($className);
 	}
 	
-	
 	/**
 	 * Updates it's parent model to reflect one of it's children has updated.
 	 */
@@ -117,5 +122,19 @@ class Crunches extends CActiveRecord
 		parent::afterSave();
 		
 		$this->tblTests->save();
+	}
+	
+	/**
+	 * Creates a new crunch into the database
+	 */
+	public static function newModel($tbl_tests_id){
+		// Find the parent test
+	
+		$model = Crunches::model();
+		$model->authkey = md5(mt_rand()); // Generate an auth key.
+		$model->tbl_tests_id = $tbl_tests_id;
+		$model->save();
+		
+		return $model;
 	}
 }

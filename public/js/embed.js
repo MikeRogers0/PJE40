@@ -10,7 +10,7 @@ var app = {};
  * Define the core app function
  */
 var pj40App = function(){
-	this.testId = false;
+	this.data = false;
 	this.worker = false;
 };
 
@@ -59,11 +59,11 @@ pj40App.prototype.checkin = function (){
  */
 pj40App.prototype.getData = function(){
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', '/tests/getATest', false);
+	xhr.open('GET', '/tests/getTest', false);
 	xhr.send();
 	
 	if (xhr.status === 200) {
-	  console.log(xhr.response);
+		this.data = JSON.parse(xhr.response);
 	}
 	
 	// Decode the data & set it somewhere.
@@ -74,17 +74,22 @@ pj40App.prototype.getData = function(){
  * Open the web worker & pass it the data it needs.
  */
 pj40App.prototype.openThread = function(){
-	//this.worker = new Worker('doWork.js');
-	//worker.addEventListener('message', this.responseThread, false);
+	this.worker = new Worker(this.data.test.crunch_file);
+	this.worker.addEventListener('message', this.responseThread, false);
 	
-	//worker.postMessage({'cmd': 'stop', 'msg': 'Bye'});
+	this.worker.postMessage({'cmd': 'start', 'data': this.data});
 };
 
 /**
  * Handle responses from the threads.
  */
 pj40App.prototype.responseThread = function(e){
-	// e.reply = the reply topic.
+	// e.cmd = the reply topic.
+	if(e.cmd == 'save'){
+		// Save the data to the thread.
+	}else if(e.cmd == 'completed'){
+		// close the worker and get a new test
+	}
 }
 
 
