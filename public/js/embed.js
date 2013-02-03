@@ -98,6 +98,18 @@ pj40App.prototype.responseThread = function(e){
 		// close the worker and get a new test
 		
 		console.log('Completed: ', e.data);
+		
+		// Save the results
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/tests/updateTest/'+this.data.crunch.id, false);
+		
+		// Define the form data we are posting
+		var formdata = new FormData();
+		formdata.append('Crunches[authkey]', this.data.crunch.authkey);
+		formdata.append('Crunches[crunch_number]', this.data.crunch.crunch_number);
+		formdata.append('Crunches[result]', JSON.stringify(e.data.data));
+		
+		xhr.send(formdata);
 	}
 }
 

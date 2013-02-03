@@ -28,7 +28,7 @@ class TestsController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view','iframe','getTest'),
+				'actions'=>array('index','view','iframe','getTest','updateTest'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -90,12 +90,33 @@ class TestsController extends Controller
 		);
 		
 		
+		$this->render('ajax',array(
+			'json'=>json_encode($json), // convert the $model into some json which is nicer for Javascript to use.
+		));
+	}
+	
+	/**
+	 * Outputs the test information
+	 */
+	public function actionUpdateTest($id){
+		// load a random model which is incomplete.
+		$this->layout='//layouts/empty';
 		
-		// convert the $model into some json which is nicer for Javascript to use.
-		$json = json_encode($json);
+		$model=Crunches::model()->findByPk($id);
+		
+		$json = array('status'=>FALSE);
+		
+		if(isset($_POST['Crunches'])){
+			$model->attributes=$_POST['Crunches'];
+			
+			$model->completed = 1;
+			if($model->save()){
+				$json = array('status'=>TRUE);
+			}
+		}
 		
 		$this->render('ajax',array(
-			'json'=>$json,
+			'json'=>json_encode($json), // convert the $model into some json which is nicer for Javascript to use.
 		));
 	}
 
