@@ -75,7 +75,8 @@ pj40App.prototype.getData = function(){
  */
 pj40App.prototype.openThread = function(){
 	this.worker = new Worker(this.data.test.crunch_file);
-	this.worker.addEventListener('message', this.responseThread, false);
+	this.worker.addEventListener('message', function(e){app.responseThread(e);}, false);
+	this.worker.addEventListener('error', function(e){app.responseThread(e);}, false);
 	
 	this.worker.postMessage({'cmd': 'start', 'data': this.data});
 };
@@ -85,10 +86,18 @@ pj40App.prototype.openThread = function(){
  */
 pj40App.prototype.responseThread = function(e){
 	// e.cmd = the reply topic.
-	if(e.cmd == 'save'){
+	
+	/*if(e.data.cmd == 'save'){
 		// Save the data to the thread.
-	}else if(e.cmd == 'completed'){
+	}else */
+	
+	if(e.data.cmd == 'log'){
+		// Relay information.
+		console.log('Log: ', e.data);
+	}else if(e.data.cmd == 'completed'){
 		// close the worker and get a new test
+		
+		console.log('Completed: ', e.data);
 	}
 }
 

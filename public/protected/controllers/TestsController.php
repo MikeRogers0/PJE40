@@ -75,11 +75,21 @@ class TestsController extends Controller
 		
 		// Load up the models
 		$tests = Tests::freshModel();
-		$crunch = Crunches::newModel();
+		$crunch = Crunches::newModel($tests->id);
 		
 		// Make the json object
-		$json['test'] = $tests->attributes;
-		$json['crunch'] = $crunch->attributes;
+		$json['test'] = array(
+			'id' => $tests->id,
+			'name' => $tests->name,
+			'crunch_file' => $tests->crunch_file
+		);
+		$json['crunch'] = array(
+			'authkey' => $crunch->authkey,
+			'id' => $crunch->id,
+			'crunch_number' => $crunch->crunch_number
+		);
+		
+		
 		
 		// convert the $model into some json which is nicer for Javascript to use.
 		$json = json_encode($json);

@@ -130,9 +130,13 @@ class Crunches extends CActiveRecord
 	public static function newModel($tbl_tests_id){
 		// Find the parent test
 	
-		$model = Crunches::model();
+		$model = new Crunches;
 		$model->authkey = md5(mt_rand()); // Generate an auth key.
 		$model->tbl_tests_id = $tbl_tests_id;
+		
+		// Decide on a suitable crunch number
+		$model->crunch_number = 0;
+		
 		$model->save();
 		
 		return $model;
