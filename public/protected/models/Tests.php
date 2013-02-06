@@ -16,6 +16,7 @@
  *
  * The followings are the available model relations:
  * @property Crunches[] $crunches
+ * @property Crunches[] $completed_crunches
  * @property Users $tblUsers
  */
 class Tests extends CActiveRecord
@@ -56,6 +57,7 @@ class Tests extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'crunches' => array(self::HAS_MANY, 'Crunches', 'tbl_tests_id'),
+			'completed_crunches' => array(self::HAS_MANY, 'Crunches', 'tbl_tests_id', 'condition'=>'completed=1', 'select'=>'*, DISTINCT tbl_crunches.crunch_number'),
 			'tblUsers' => array(self::BELONGS_TO, 'Users', 'tbl_users_id'),
 		);
 	}
@@ -143,4 +145,15 @@ class Tests extends CActiveRecord
 		
 		return Tests::model()->find($criteria);
 	 }
+	 
+	 /**
+	  *
+	 */
+	public function getDistinctResults(){
+		foreach($this->completed_crunches as $completed_crunches){
+			$results[$completed_crunches->crunch_number] = json_decode($completed_crunches->result);
+		}
+	
+		return $results;
+	}
 }

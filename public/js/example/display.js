@@ -15,7 +15,7 @@ function Displayer(){
  * When the start command is issued.
  */
 Displayer.prototype.run = function(){
-	this.write = this.data;
+	this.write = this.data[0].threadsProcessed + ' Things processed';
 	
 	self.postMessage({'cmd': 'write','data': this.write});
 	self.close();
