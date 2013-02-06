@@ -26,6 +26,8 @@ $this->menu=array(
 	<li><?php echo CHtml::encode($model->getAttributeLabel('description')); ?>: <?php echo CHtml::encode($model->description); ?></li>
 </ul>
 
+<h2>Results</h2>
+
 <div id="testResults" class="loading">
 	<p>Test results are loading</p>
 </div>
