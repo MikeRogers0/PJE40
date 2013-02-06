@@ -33,11 +33,11 @@
 	<?php echo CHtml::encode($data->completed); ?>
 	<br />
 
-	<?php /*
 	<b><?php echo CHtml::encode($data->getAttributeLabel('tbl_users_id')); ?>:</b>
 	<?php echo CHtml::encode($data->tbl_users_id); ?>
 	<br />
 
-	*/ ?>
-
+	<b><?php echo CHtml::encode($data->getAttributeLabel('description')); ?>:</b>
+	<?php echo CHtml::encode($data->description); ?>
+	<br />
 </div>

@@ -16,18 +16,25 @@ $this->menu=array(
 );
 ?>
 
-<h1>View Tests #<?php echo $model->id; ?></h1>
+<h1>View Test: <?php echo $model->name; ?></h1>
 
-<?php $this->widget('zii.widgets.CDetailView', array(
-	'data'=>$model,
-	'attributes'=>array(
-		'id',
-		'name',
-		'crunch_file',
-		'display_file',
-		'crunches_required',
-		'last_crunched',
-		'completed',
-		'tbl_users_id',
-	),
-)); ?>
+<ul>
+	<li><?php echo CHtml::encode($model->getAttributeLabel('last_crunched')); ?>: <?php echo CHtml::encode($model->last_crunched); ?></li>
+	<li><?php echo CHtml::encode($model->getAttributeLabel('tbl_users_id')); ?>: <?php echo CHtml::encode($model->tbl_users_id); ?></li>
+	<li><?php echo CHtml::encode($model->getAttributeLabel('completed')); ?>: <?php echo CHtml::encode($model->completed); ?></li>
+	<li><?php echo CHtml::encode($model->getAttributeLabel('crunches_required')); ?>: <?php echo CHtml::encode($model->crunches_required); ?></li>
+	<li><?php echo CHtml::encode($model->getAttributeLabel('description')); ?>: <?php echo CHtml::encode($model->description); ?></li>
+</ul>
+
+<div id="testResults" class="loading">
+	<p>Test results are loading</p>
+</div>
+
+<script>
+	var config = {
+		display_file: '<?php echo CHtml::encode($model->display_file); ?>',
+		results: JSON.parse('<?php echo $results; ?>'),
+		wrapper: document.getElementById('testResults'),
+	};
+</script>
+<script src="/js/view.js"></script>

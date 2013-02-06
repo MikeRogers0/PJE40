@@ -51,8 +51,11 @@ class TestsController extends Controller
 	 */
 	public function actionView($id)
 	{
+		$results = json_encode('Hello from the cloud');
+		
 		$this->render('view',array(
 			'model'=>$this->loadModel($id),
+			'results'=>$results,
 		));
 	}
 	

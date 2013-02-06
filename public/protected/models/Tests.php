@@ -12,6 +12,7 @@
  * @property string $last_crunched
  * @property integer $completed
  * @property integer $tbl_users_id
+ * @property string $description
  *
  * The followings are the available model relations:
  * @property Crunches[] $crunches
@@ -38,7 +39,7 @@ class Tests extends CActiveRecord
 			array('name, crunch_file, tbl_users_id', 'required'),
 			array('crunches_required, completed, tbl_users_id', 'numerical', 'integerOnly'=>true),
 			array('name, crunch_file, display_file', 'length', 'max'=>45),
-			array('last_crunched', 'safe'),
+			array('last_crunched, description', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, name, crunch_file, display_file, crunches_required, last_crunched, completed, tbl_users_id', 'safe', 'on'=>'search'),
@@ -73,6 +74,7 @@ class Tests extends CActiveRecord
 			'last_crunched' => 'Last Crunched',
 			'completed' => 'Completed',
 			'tbl_users_id' => 'Tbl Users',
+			'description' => 'Description',
 		);
 	}
 
@@ -102,6 +104,7 @@ class Tests extends CActiveRecord
 		$criteria->compare('last_crunched',$this->last_crunched,true);
 		$criteria->compare('completed',$this->completed);
 		$criteria->compare('tbl_users_id',$this->tbl_users_id);
+		$criteria->compare('description',$this->description,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
