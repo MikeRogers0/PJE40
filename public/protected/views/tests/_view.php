@@ -1,12 +1,7 @@
-<?php
-/* @var $this TestsController */
-/* @var $data Tests */
-?>
+<div class="well">
 
-<div class="view">
-
-	<b><?php echo CHtml::encode($data->getAttributeLabel('id')); ?>:</b>
-	<?php echo CHtml::link(CHtml::encode($data->id), array('view', 'id'=>$data->id)); ?>
+	<?php /*<b><?php echo CHtml::encode($data->getAttributeLabel('id')); ?>:</b>
+	<?php echo CHtml::link(CHtml::encode($data->id),array('view','id'=>$data->id)); ?>
 	<br />
 
 	<b><?php echo CHtml::encode($data->getAttributeLabel('name')); ?>:</b>
@@ -39,5 +34,21 @@
 
 	<b><?php echo CHtml::encode($data->getAttributeLabel('description')); ?>:</b>
 	<?php echo CHtml::encode($data->description); ?>
-	<br />
+	<br />*/ ?>
+	
+	<h2><?php echo CHtml::encode($data->name); ?></h2>
+	<p><?php echo CHtml::encode($data->description); ?></p>
+	
+	<p><?php echo CHtml::encode($data->getAttributeLabel('last_crunched')); ?>: <?php echo CHtml::encode($data->last_crunched); ?></p>
+	<p>Total Crunches: <?php echo count($data->completed_crunches); ?> of <?php echo CHtml::encode($data->crunches_required); ?></p>
+	<div class="progress progress-striped">
+		<div class="bar" style="width:<?php echo (count($data->completed_crunches) / $data->crunches_required) * 100 ?>%;"></div>
+	</div>
+	<?php
+	if($data->completed == '1'){
+		echo CHtml::link('View Result',array('view','id'=>$data->id), array('class'=>'btn')); 
+	}else{
+		echo CHtml::link('Results Unavailable','#', array('class'=>'btn disabled')); 
+	}
+	?>
 </div>

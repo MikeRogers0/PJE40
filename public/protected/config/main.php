@@ -2,6 +2,7 @@
 
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
+Yii::setPathOfAlias('bootstrap', dirname(__FILE__).'/../extensions/bootstrap');
 
 // This is the main Web application configuration. Any writable
 // CWebApplication properties can be configured here.
@@ -27,6 +28,9 @@ return array(
 			'password'=>'Enter Your Password Here',
 			// If removed, Gii defaults to localhost only. Edit carefully to taste.
 			'ipFilters'=>array('127.0.0.1','::1'),
+			'generatorPaths'=>array(
+                'bootstrap.gii',
+            ),
 		),
 		// Users module
 		'user'=>array(
@@ -112,6 +116,9 @@ return array(
 				*/
 			),
 		),
+		'bootstrap'=>array(
+            'class'=>'bootstrap.components.Bootstrap',
+        ),
 	),
 
 	// application-level parameters that can be accessed

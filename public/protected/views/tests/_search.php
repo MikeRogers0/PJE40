@@ -1,65 +1,32 @@
-<?php
-/* @var $this TestsController */
-/* @var $model Tests */
-/* @var $form CActiveForm */
-?>
-
-<div class="wide form">
-
-<?php $form=$this->beginWidget('CActiveForm', array(
+<?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	'action'=>Yii::app()->createUrl($this->route),
 	'method'=>'get',
 )); ?>
 
-	<div class="row">
-		<?php echo $form->label($model,'id'); ?>
-		<?php echo $form->textField($model,'id'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'id',array('class'=>'span5')); ?>
 
-	<div class="row">
-		<?php echo $form->label($model,'name'); ?>
-		<?php echo $form->textField($model,'name',array('size'=>45,'maxlength'=>45)); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>45)); ?>
 
-	<div class="row">
-		<?php echo $form->label($model,'crunch_file'); ?>
-		<?php echo $form->textField($model,'crunch_file',array('size'=>45,'maxlength'=>45)); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'crunch_file',array('class'=>'span5','maxlength'=>45)); ?>
 
-	<div class="row">
-		<?php echo $form->label($model,'display_file'); ?>
-		<?php echo $form->textField($model,'display_file',array('size'=>45,'maxlength'=>45)); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'display_file',array('class'=>'span5','maxlength'=>45)); ?>
 
-	<div class="row">
-		<?php echo $form->label($model,'crunches_required'); ?>
-		<?php echo $form->textField($model,'crunches_required'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'crunches_required',array('class'=>'span5')); ?>
 
-	<div class="row">
-		<?php echo $form->label($model,'last_crunched'); ?>
-		<?php echo $form->textField($model,'last_crunched'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'last_crunched',array('class'=>'span5')); ?>
 
-	<div class="row">
-		<?php echo $form->label($model,'completed'); ?>
-		<?php echo $form->textField($model,'completed'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'completed',array('class'=>'span5')); ?>
 
-	<div class="row">
-		<?php echo $form->label($model,'tbl_users_id'); ?>
-		<?php echo $form->textField($model,'tbl_users_id'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'tbl_users_id',array('class'=>'span5')); ?>
 
-	<div class="row">
-		<?php echo $form->label($model,'description'); ?>
-		<?php echo $form->textArea($model,'description',array('rows'=>6, 'cols'=>50)); ?>
-	</div>
+	<?php echo $form->textAreaRow($model,'description',array('rows'=>6, 'cols'=>50, 'class'=>'span8')); ?>
 
-	<div class="row buttons">
-		<?php echo CHtml::submitButton('Search'); ?>
+	<div class="form-actions">
+		<?php $this->widget('bootstrap.widgets.TbButton', array(
+		    'buttonType'=>'submit'
+			'type'=>'primary',
+			'label'=>'Search',
+		)); ?>
 	</div>
 
 <?php $this->endWidget(); ?>
-
-</div><!-- search-form -->

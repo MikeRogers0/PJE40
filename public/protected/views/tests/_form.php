@@ -1,72 +1,34 @@
-<?php
-/* @var $this TestsController */
-/* @var $model Tests */
-/* @var $form CActiveForm */
-?>
-
-<div class="form">
-
-<?php $form=$this->beginWidget('CActiveForm', array(
+<?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	'id'=>'tests-form',
 	'enableAjaxValidation'=>false,
 )); ?>
 
-	<p class="note">Fields with <span class="required">*</span> are required.</p>
+	<p class="help-block">Fields with <span class="required">*</span> are required.</p>
 
 	<?php echo $form->errorSummary($model); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'name'); ?>
-		<?php echo $form->textField($model,'name',array('size'=>45,'maxlength'=>45)); ?>
-		<?php echo $form->error($model,'name'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>45)); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'crunch_file'); ?>
-		<?php echo $form->textField($model,'crunch_file',array('size'=>45,'maxlength'=>45)); ?>
-		<?php echo $form->error($model,'crunch_file'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'crunch_file',array('class'=>'span5','maxlength'=>45)); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'display_file'); ?>
-		<?php echo $form->textField($model,'display_file',array('size'=>45,'maxlength'=>45)); ?>
-		<?php echo $form->error($model,'display_file'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'display_file',array('class'=>'span5','maxlength'=>45)); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'crunches_required'); ?>
-		<?php echo $form->textField($model,'crunches_required'); ?>
-		<?php echo $form->error($model,'crunches_required'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'crunches_required',array('class'=>'span5')); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'last_crunched'); ?>
-		<?php echo $form->textField($model,'last_crunched'); ?>
-		<?php echo $form->error($model,'last_crunched'); ?>
-	</div>
+	<?php /*<?php echo $form->textFieldRow($model,'last_crunched',array('class'=>'span5')); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'completed'); ?>
-		<?php echo $form->textField($model,'completed'); ?>
-		<?php echo $form->error($model,'completed'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'completed',array('class'=>'span5')); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'tbl_users_id'); ?>
-		<?php echo $form->textField($model,'tbl_users_id'); ?>
-		<?php echo $form->error($model,'tbl_users_id'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'tbl_users_id',array('class'=>'span5')); ?> */ ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'description'); ?>
-		<?php echo $form->textArea($model,'description',array('rows'=>6, 'cols'=>50)); ?>
-		<?php echo $form->error($model,'description'); ?>
-	</div>
+	<?php echo $form->textAreaRow($model,'description',array('rows'=>6, 'cols'=>50, 'class'=>'span8')); ?>
 
-	<div class="row buttons">
-		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+	<div class="form-actions">
+		<?php $this->widget('bootstrap.widgets.TbButton', array(
+			'buttonType'=>'submit',
+			'type'=>'primary',
+			'label'=>$model->isNewRecord ? 'Create' : 'Save',
+		)); ?>
 	</div>
 
 <?php $this->endWidget(); ?>
-
-</div><!-- form -->

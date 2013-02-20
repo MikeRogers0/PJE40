@@ -1,22 +1,16 @@
 <?php /* @var $this Controller */ ?>
 <?php $this->beginContent('//layouts/main'); ?>
-<div class="span-19">
-	<div id="content">
+<div class="row">
+	<div class="span8">
 		<?php echo $content; ?>
-	</div><!-- content -->
-</div>
-<div class="span-5 last">
-	<div id="sidebar">
+	</div>
+	<div class="offset1 span3">
 	<?php
-		$this->beginWidget('zii.widgets.CPortlet', array(
-			'title'=>'Operations',
+		$this->widget('bootstrap.widgets.TbMenu', array(
+			'type'=>'list',
+			'items'=>array_merge(array(array('label'=>'Operations')), $this->menu),
 		));
-		$this->widget('zii.widgets.CMenu', array(
-			'items'=>$this->menu,
-			'htmlOptions'=>array('class'=>'operations'),
-		));
-		$this->endWidget();
 	?>
-	</div><!-- sidebar -->
+	</div>
 </div>
 <?php $this->endContent(); ?>

@@ -25,7 +25,7 @@ If you have inquiries or other questions, please fill out the following form to 
 
 <div class="form">
 
-<?php $form=$this->beginWidget('CActiveForm', array(
+<?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	'id'=>'contact-form',
 	'enableClientValidation'=>true,
 	'clientOptions'=>array(
@@ -36,33 +36,17 @@ If you have inquiries or other questions, please fill out the following form to 
 	<p class="note">Fields with <span class="required">*</span> are required.</p>
 
 	<?php echo $form->errorSummary($model); ?>
+	
+	<?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>45)); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'name'); ?>
-		<?php echo $form->textField($model,'name'); ?>
-		<?php echo $form->error($model,'name'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'email',array('class'=>'span5','maxlength'=>45)); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'email'); ?>
-		<?php echo $form->textField($model,'email'); ?>
-		<?php echo $form->error($model,'email'); ?>
-	</div>
+	<?php echo $form->textFieldRow($model,'subject',array('class'=>'span5','maxlength'=>45)); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'subject'); ?>
-		<?php echo $form->textField($model,'subject',array('size'=>60,'maxlength'=>128)); ?>
-		<?php echo $form->error($model,'subject'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'body'); ?>
-		<?php echo $form->textArea($model,'body',array('rows'=>6, 'cols'=>50)); ?>
-		<?php echo $form->error($model,'body'); ?>
-	</div>
+	<?php echo $form->textAreaRow($model,'body',array('rows'=>6, 'cols'=>50, 'class'=>'span5')); ?>
 
 	<?php if(CCaptcha::checkRequirements()): ?>
-	<div class="row">
+	<div class="">
 		<?php echo $form->labelEx($model,'verifyCode'); ?>
 		<div>
 		<?php $this->widget('CCaptcha'); ?>
@@ -74,8 +58,12 @@ If you have inquiries or other questions, please fill out the following form to 
 	</div>
 	<?php endif; ?>
 
-	<div class="row buttons">
-		<?php echo CHtml::submitButton('Submit'); ?>
+	<div class="">
+		<?php $this->widget('bootstrap.widgets.TbButton', array(
+			'buttonType'=>'submit',
+			'type'=>'primary',
+			'label'=>'Send',
+		)); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

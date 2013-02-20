@@ -1,3 +1,6 @@
 [submodule "public/protected/modules/user"]
 	path = public/protected/modules/user
 	url = git@github.com:mishamx/yii-user.git
+[submodule "public/protected/extensions/bootstrap"]
+	path = public/protected/extensions/bootstrap
+	url = git://github.com/motin/yii-bootstrap.git

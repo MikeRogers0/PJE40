@@ -1,15 +1,12 @@
 <?php
-/* @var $this TestsController */
-/* @var $model Tests */
-
 $this->breadcrumbs=array(
 	'Tests'=>array('index'),
 	'Create',
 );
 
 $this->menu=array(
-	array('label'=>'List Tests', 'url'=>array('index')),
-	array('label'=>'Manage Tests', 'url'=>array('admin')),
+	array('label'=>'List Tests','url'=>array('index')),
+	array('label'=>'Manage Tests','url'=>array('admin')),
 );
 ?>
 

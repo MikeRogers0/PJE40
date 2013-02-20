@@ -57,7 +57,7 @@ class Tests extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'crunches' => array(self::HAS_MANY, 'Crunches', 'tbl_tests_id'),
-			'completed_crunches' => array(self::HAS_MANY, 'Crunches', 'tbl_tests_id', 'condition'=>'completed=1', 'select'=>'*, DISTINCT tbl_crunches.crunch_number'),
+			'completed_crunches' => array(self::HAS_MANY, 'Crunches', 'tbl_tests_id', 'condition'=>'completed=1', 'select'=>'*', 'group'=>'tbl_tests_id, crunch_number'),
 			'tblUsers' => array(self::BELONGS_TO, 'Users', 'tbl_users_id'),
 		);
 	}
@@ -127,10 +127,13 @@ class Tests extends CActiveRecord
 	/**
 	 * Updates the completed field.
 	 */
-	protected function afterSave(){
-		parent::afterSave();
-		
-		
+	protected function beforeSave() {
+		// If we done them all, remember that.
+		if(count($this->completed_crunches) >= $this->crunches_required){
+			$this->completed = 1;
+		}
+	
+		return parent::beforeSave();
 	}
 	
 	/**
@@ -141,7 +144,7 @@ class Tests extends CActiveRecord
 		//$criteria->select='title';  // only select the 'title' column
 		$criteria->condition='completed=:completed';
 		$criteria->params=array(':completed'=>0);
-		$criteria->order='last_crunched DESC';
+		$criteria->order='last_crunched ASC';
 		
 		return Tests::model()->find($criteria);
 	 }

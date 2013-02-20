@@ -66,9 +66,14 @@ class TestsController extends Controller
 	 */
 	public function actionIframe()
 	{
+		$debug = 'false';
+		if(Yii::app()->getRequest()->getQuery('debug')){
+			$debug = 'true';
+		}
+		
 		// Just reset the layout to be minial.
 		$this->layout='//layouts/min';
-		$this->render('iframe');
+		$this->render('iframe', array('debug'=>$debug));
 	}
 	
 	/**
@@ -78,21 +83,26 @@ class TestsController extends Controller
 		// load a random model which is incomplete.
 		$this->layout='//layouts/empty';
 		
+		$json['status'] = 'false';
+		
 		// Load up the models
 		$tests = Tests::freshModel();
-		$crunch = Crunches::newModel($tests->id);
-		
-		// Make the json object
-		$json['test'] = array(
-			'id' => $tests->id,
-			'name' => $tests->name,
-			'crunch_file' => $tests->crunch_file
-		);
-		$json['crunch'] = array(
-			'authkey' => $crunch->authkey,
-			'id' => $crunch->id,
-			'crunch_number' => $crunch->crunch_number
-		);
+		if($tests){
+			$crunch = Crunches::newModel($tests);
+			
+			$json['status'] = 'true';
+			// Make the json object
+			$json['test'] = array(
+				'id' => $tests->id,
+				'name' => $tests->name,
+				'crunch_file' => $tests->crunch_file
+			);
+			$json['crunch'] = array(
+				'authkey' => $crunch->authkey,
+				'id' => $crunch->id,
+				'crunch_number' => $crunch->crunch_number
+			);
+		}
 		
 		
 		$this->render('ajax',array(
