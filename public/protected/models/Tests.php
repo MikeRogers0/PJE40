@@ -153,6 +153,7 @@ class Tests extends CActiveRecord
 	  *
 	 */
 	public function getDistinctResults(){
+		$results = '';
 		foreach($this->completed_crunches as $completed_crunches){
 			$results[$completed_crunches->crunch_number] = json_decode($completed_crunches->result);
 		}
