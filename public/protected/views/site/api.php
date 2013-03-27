@@ -61,7 +61,7 @@ $this->pageTitle=Yii::app()->name;
 				<code>
 					<?php
 						echo htmlentities("
-					self.postMessage({'cmd': 'loadImafe','data': 'http://www.asite.com/image.jpg'});
+					self.postMessage({'cmd': 'loadImage','data': 'http://www.asite.com/image.jpg'});
 					");
 					?> 
 				</code>
