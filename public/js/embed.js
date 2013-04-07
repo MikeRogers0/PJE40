@@ -35,12 +35,7 @@ pj40App.prototype.start = function(){
 	// Lets make sure no other crunchers start
 	this.checkin();
 	
-	if(this.hasUnfinishedBusiness()){
-		this.openThread();
-	}
-	
-	// Get the data, when the data is got the thread will open and process the new stuff.
-	this.getData();
+	this.startSocket();
 };
 
 /**
@@ -48,6 +43,25 @@ pj40App.prototype.start = function(){
  */
 pj40App.prototype.hasUnfinishedBusiness = function(){
 	return false;
+}
+
+/**
+ * Opens the socket to the server to start recieving stuff
+ */
+pj40App.prototype.startSocket = function(){
+	// Connect to the socket.
+	socket = io.connect('http://pje40.local:1337');
+	socket.emit('ready'); // Tell it were ready.
+	
+	if(this.hasUnfinishedBusiness()){
+		this.openThread();
+	}
+	
+	socket.on('taskReady', function (data) {
+		// 
+		//save the data.
+		this.openThread();
+	});
 }
 
 /**

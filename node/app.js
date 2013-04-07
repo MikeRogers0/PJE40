@@ -8,9 +8,10 @@ var
 	idleUsers = [],
 	activeUsers = [];
 
-io.sockets.on('connection', function (socket) {  
+io.sockets.on('connection', function (socket) { 
 	// When the user is ready to recieve a test
 	socket.on('ready', function () {
+		console.log({'user': socket, 'status': 'ready'});
 		idleUsers[socket] = true;
 	});
 	
