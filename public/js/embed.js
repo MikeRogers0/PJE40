@@ -53,6 +53,8 @@ pj40App.prototype.startSocket = function(){
 	socket = io.connect('http://pje40.local:1337');
 	socket.emit('ready'); // Tell it were ready.
 	
+	debug('Socket', 'Connected')
+	
 	if(this.hasUnfinishedBusiness()){
 		this.openThread();
 	}
