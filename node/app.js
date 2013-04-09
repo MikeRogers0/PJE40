@@ -25,18 +25,28 @@ io.sockets.on('connection', function (socket) {
 		idleUsers[socket.id] = socket;
 	});
 	
-	/*socket.on('save', function () {
-		console.log(socket.id + ' Save');
+	socket.on('save', function (data) {
+		console.log(socket.id + ' Save', data);
+		
+		var testID = data.test.id;
 		
 		// Save the data the user was working on.
-		if(activeUsers[socket.id].task == true){
-			console.log('The user has a task.');
-		}
+		db.query('UPDATE tbl_crunches SET result = ?, completed = 1 WHERE id = ?', [JSON.stringify(data.result), data.crunch.id], function(err, result){
+			// Update the parent to check if it's completed.
+			db.query(
+			'UPDATE tbl_tests SET tbl_tests.completed = 1 WHERE '+
+			'tbl_tests.id = '+db.escape(testID)+' AND tbl_tests.crunches_required = ('+
+			'SELECT COUNT(tbl_crunches.tbl_tests_id) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+db.escape(testID)+' AND completed = 1'+
+			')');
+		});
+		
+		
+		
 		
 		// Set the user as idle.
 		delete activeUsers[socket.id];
 		idleUsers[socket.id] = socket;
-	});*/
+	});
 	
 	// When the user disconnects remove them from the list
 	socket.on('disconnect', function () {
@@ -67,7 +77,7 @@ function updateTasks(){
 	
 	console.log('Total Ready Users: ', count_idleUsers);
 	
-	//if(count_idleUsers >= 1){
+	if(count_idleUsers >= 1){
 		// Do the SQL
 		db.query(
 			'SELECT tbl_tests.id, (COUNT(tbl_crunches.tbl_tests_id)) AS totalCrunches '+
@@ -76,7 +86,7 @@ function updateTasks(){
 			'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
 			'WHERE tbl_tests.completed = 0 '+
 			'GROUP BY  tbl_tests.id '+
-			'ORDER BY tbl_tests.last_crunched ASC ', 
+			'ORDER BY tbl_tests.last_crunched ASC LIMIT 0,'+count_idleUsers, 
 		function(err, rows) {
 			if (err) throw err;
 			
@@ -85,11 +95,58 @@ function updateTasks(){
 			
 				// Make a crunch & Add it to the DB.
 				console.log('Adding in query ', rows[row]);
-				query = db.query('INSERT INTO tbl_crunches SET ?', {tbl_tests_id: rows[row].id, crunch_number: (rows[row].totalCrunches + 1)}, function(err, result){
+				db.query('INSERT INTO tbl_crunches SET ?', {
+					tbl_tests_id: rows[row].id, 
+					crunch_number: (rows[row].totalCrunches),
+					authkey: parseInt(Math.random() * 320000000),
+					last_activity: new Date()
+				}, function(err, result){
 					if (err) throw err;
 					//console.log(err, db, result);
+					
+					console.log(rows[row], result.insertId);
+					
+					// Pull up the newly added crunch.
+					query = db.query(
+						'SELECT '+
+						'tbl_tests.id AS test_id, tbl_tests.name AS test_name, tbl_tests.crunch_file AS test_crunch_file, tbl_crunches.authkey AS crunch_authkey, tbl_crunches.id AS crunch_id, tbl_crunches.crunch_number AS crunch_crunch_number '+
+						'FROM tbl_tests '+
+						'INNER JOIN '+
+						'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
+						'WHERE tbl_crunches.id = '+result.insertId+' '+
+						'LIMIT 0,1', 
+							function(err, crunchAndTest) {
+								if (err) throw err;
+								
+								console.log(crunchAndTest);
+								
+								for(var user in idleUsers){
+									// Remove user from idle users list to active.
+									activeUsers[user] = idleUsers[user]; 
+									delete idleUsers[user];
+									
+									// Convert the row result to a nice sexy object:
+									var SexyCrunch = {
+										test: {
+											id: crunchAndTest[0].test_id,
+											name: crunchAndTest[0].test_name,
+											crunch_file: crunchAndTest[0].test_crunch_file
+										},
+										crunch: {
+											authkey: crunchAndTest[0].crunch_authkey,
+											id: crunchAndTest[0].crunch_id,
+											crunch_number: crunchAndTest[0].crunch_crunch_number,
+										}
+									}
+									
+									activeUsers[user].emit('taskReady', SexyCrunch);
+									
+									return;
+								}
+							});
+					//console.log(query.sql)
+					
 				});
-				console.log(query.sql);
 			}
 			
 		});
@@ -97,8 +154,8 @@ function updateTasks(){
 		// Anything not being processed, make a few crunches
 		
 		// Send them to users.
-	//}
+	}
 	
-	//setTimeout(updateTasks, 25000);
+	setTimeout(updateTasks, 5000);
 }
 setTimeout(updateTasks, 1000);
