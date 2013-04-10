@@ -36,7 +36,7 @@ io.sockets.on('connection', function (socket) {
 			db.query(
 			'UPDATE tbl_tests SET tbl_tests.completed = 1 WHERE '+
 			'tbl_tests.id = '+db.escape(testID)+' AND tbl_tests.crunches_required = ('+
-			'SELECT (COUNT(tbl_crunches.tbl_tests_id) - 1) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+db.escape(testID)+' AND completed = 1'+
+			'SELECT (COUNT(tbl_crunches.tbl_tests_id)) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+db.escape(testID)+' AND completed = 1'+
 			')');
 		});
 		
@@ -156,6 +156,6 @@ function updateTasks(){
 		// Send them to users.
 	}
 	
-	setTimeout(updateTasks, 5000);
+	setTimeout(updateTasks, 500);
 }
 setTimeout(updateTasks, 1000);
