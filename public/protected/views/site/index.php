@@ -19,13 +19,13 @@ $this->pageTitle=Yii::app()->name;
 		<code>
 			<?php
 				echo htmlentities('
-				<iframe src="http://pje40.local/tests/iframe" width="0" height="0"></iframe>
+				<iframe src="http://'.$_SERVER['SERVER_NAME'].'/tests/iframe" width="0" height="0"></iframe>
 				');
 			?> 
 		</code>
 	</div>
 	<div class="offset1 span5">
 		<h2>See it in action below</h2>
-		<iframe src="http://pje40.local/tests/iframe?debug=true" width="100%" height="250"></iframe>
+		<iframe src="/tests/iframe?debug=true" width="100%" height="250"></iframe>
 	</div>
 </div>
