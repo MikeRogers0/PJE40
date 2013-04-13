@@ -18,6 +18,16 @@ var
 	
 db.connect();
 
+/**
+ * Get the microtime.
+ * From: http://jeffrey-kohn.com/code/javascript-equivalent-phps-microtime
+ */
+function microtime(get_as_float){
+    var unixtime_ms = new Date().getTime();
+    var sec = parseInt(unixtime_ms / 1000);
+    return get_as_float ? (unixtime_ms/1000) : (unixtime_ms - (sec * 1000))/1000 + ' ' + sec;
+}
+
 io.sockets.on('connection', function (socket) { 
 	// When the user is ready to recieve a test
 	socket.on('ready', function () {
@@ -30,8 +40,13 @@ io.sockets.on('connection', function (socket) {
 		
 		var testID = data.test.id;
 		
+		data.crunch.time_returned = microtime(true);
+		data.crunch.time_latency = (data.crunch.time_returned - data.crunch.time_sent) - data.crunch.time_processing;
+		
+		
+		
 		// Save the data the user was working on.
-		db.query('UPDATE tbl_crunches SET result = ?, completed = 1 WHERE id = ?', [JSON.stringify(data.result), data.crunch.id], function(err, result){
+		db.query('UPDATE tbl_crunches SET result = ?, time_returned = ?, time_processing = ?, time_latency = ?, completed = 1 WHERE id = ?', [JSON.stringify(data.result), data.crunch.time_returned, data.crunch.time_processing, data.crunch.time_latency,  data.crunch.id], function(err, result){
 			// Update the parent to check if it's completed.
 			db.query(
 			'UPDATE tbl_tests SET tbl_tests.completed = 1 WHERE '+
@@ -75,7 +90,7 @@ function updateTasks(){
 		count_idleUsers++;
 	}
 	
-	console.log('Total Ready Users: ', count_idleUsers);
+	//console.log('Total Ready Users: ', count_idleUsers);
 	
 	if(count_idleUsers >= 1){
 		// Do the SQL
@@ -98,6 +113,7 @@ function updateTasks(){
 				db.query('INSERT INTO tbl_crunches SET ?', {
 					tbl_tests_id: rows[row].id, 
 					crunch_number: (rows[row].totalCrunches),
+					time_sent: microtime(true),
 					authkey: parseInt(Math.random() * 320000000),
 					last_activity: new Date()
 				}, function(err, result){
@@ -109,7 +125,7 @@ function updateTasks(){
 					// Pull up the newly added crunch.
 					query = db.query(
 						'SELECT '+
-						'tbl_tests.id AS test_id, tbl_tests.name AS test_name, tbl_tests.crunch_file AS test_crunch_file, tbl_crunches.authkey AS crunch_authkey, tbl_crunches.id AS crunch_id, tbl_crunches.crunch_number AS crunch_crunch_number '+
+						'tbl_tests.id AS test_id, tbl_tests.name AS test_name, tbl_tests.crunch_file AS test_crunch_file, tbl_crunches.authkey AS crunch_authkey, tbl_crunches.id AS crunch_id, tbl_crunches.crunch_number AS crunch_crunch_number, tbl_crunches.time_sent AS crunch_time_sent '+
 						'FROM tbl_tests '+
 						'INNER JOIN '+
 						'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
@@ -136,6 +152,7 @@ function updateTasks(){
 											authkey: crunchAndTest[0].crunch_authkey,
 											id: crunchAndTest[0].crunch_id,
 											crunch_number: crunchAndTest[0].crunch_crunch_number,
+											time_sent: crunchAndTest[0].crunch_time_sent,
 										}
 									}
 									

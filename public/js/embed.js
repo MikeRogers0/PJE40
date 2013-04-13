@@ -117,7 +117,7 @@ pj40App.prototype.responseThread = function(e){
 		// close the worker and get a new test
 		
 		debug('Completed (From Thread)', e.data);
-		this.data.crunch.time_processing = (microtime(true) - this.data.crunch.crunch_started;
+		this.data.crunch.time_processing = (microtime(true) - this.data.crunch.crunch_started);
 		
 		socket.emit('save', {test: this.data.test, crunch: this.data.crunch, result: JSON.stringify(e.data.data)});
 	}
