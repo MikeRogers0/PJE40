@@ -7,6 +7,16 @@ function debug(message, data){
 		console.log(message, data);
 	}
 }
+
+/**
+ * Get the microtime.
+ * From: http://jeffrey-kohn.com/code/javascript-equivalent-phps-microtime
+ */
+function microtime(get_as_float){
+    var unixtime_ms = new Date().getTime();
+    var sec = parseInt(unixtime_ms / 1000);
+    return get_as_float ? (unixtime_ms/1000) : (unixtime_ms - (sec * 1000))/1000 + ' ' + sec;
+}
  
 /**
  * Define the core app function
@@ -44,19 +54,21 @@ pj40App.prototype.start = function(){
 };
 
 /**
- * Checks if the app has been working on something previously it didn't finish.
- */
-pj40App.prototype.hasUnfinishedBusiness = function(){
-	return false;
-}
-
-/**
  * Checkin the application so we don't kill the users machine.
  */
 pj40App.prototype.checkin = function (){
 	localStorage['lastCheckin'] = (new Date() * 1);
 	setTimeout(function(){app.checkin();}, config.checkinDelay);
 };
+
+/**
+ * Checks if the app has been working on something previously it didn't finish.
+ */
+pj40App.prototype.hasUnfinishedBusiness = function(){
+	return false;
+}
+
+
 
 /** 
  * Pulls data from the main site asking it what we should be processing.
@@ -87,6 +99,7 @@ pj40App.prototype.getData = function(){
  */
 pj40App.prototype.openThread = function(){
 	debug('Event', 'Starting test '+this.data.test.name+' (Crunch Number: '+this.data.crunch.crunch_number+')');
+	this.data.crunch.crunch_started = microtime(true);
 	this.worker = new Worker(this.data.test.crunch_file);
 	this.worker.addEventListener('message', function(e){app.responseThread(e);}, false);
 	this.worker.addEventListener('error', function(e){app.responseThread(e);}, false);
@@ -120,6 +133,7 @@ pj40App.prototype.responseThread = function(e){
 		var formdata = new FormData();
 		formdata.append('Crunches[authkey]', this.data.crunch.authkey);
 		formdata.append('Crunches[crunch_number]', this.data.crunch.crunch_number);
+		formdata.append('Crunches[time_processing]', (microtime(true) - this.data.crunch.crunch_started));
 		formdata.append('Crunches[result]', JSON.stringify(e.data.data));
 		
 		xhr.send(formdata);
