@@ -65,8 +65,7 @@ $this->widget('bootstrap.widgets.TbNavbar',
 
 <div id="footer">
 	<div class="container">	
-		Copyright &copy; <?php echo date('Y'); ?> by My Company.<br/>
-		All Rights Reserved.<br/>
+		PJE40 - 447955 Final Year Project<br/>
 		<?php echo Yii::powered(); ?>
 	</div>
 </div>

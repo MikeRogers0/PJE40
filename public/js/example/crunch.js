@@ -44,7 +44,7 @@ Cruncher.prototype.run = function(){
 		this.someProcessing();
 	}
 	
-	this.endCallback();
+	setTimeout(function(){cruncher.endCallback();}, 1000);
 }
 
 /**

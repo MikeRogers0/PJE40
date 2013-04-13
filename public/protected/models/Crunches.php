@@ -11,6 +11,10 @@
  * @property string $result
  * @property integer $completed
  * @property integer $crunch_number
+ * @property double $time_sent
+ * @property double $time_returned
+ * @property double $time_processing
+ * @property double $time_latency
  *
  * The followings are the available model relations:
  * @property Tests $tblTests
@@ -35,6 +39,7 @@ class Crunches extends CActiveRecord
 		return array(
 			array('tbl_tests_id', 'required'),
 			array('tbl_tests_id, completed, crunch_number', 'numerical', 'integerOnly'=>true),
+			array('time_sent, time_returned, time_processing, time_latency', 'numerical'),
 			array('authkey', 'length', 'max'=>45),
 			array('last_activity, result', 'safe'),
 			// The following rule is used by search().
@@ -42,6 +47,8 @@ class Crunches extends CActiveRecord
 			array('id, tbl_tests_id, authkey, last_activity, result, crunch_number, completed', 'safe', 'on'=>'search'),
 			array('last_activity','default', 'value'=>new CDbExpression('NOW()'), 'setOnEmpty'=>false,'on'=>'update'),
 			array('last_activity','default', 'value'=>new CDbExpression('NOW()'), 'setOnEmpty'=>false,'on'=>'insert'),
+			array('time_returned','default', 'value'=>microtime(true), 'setOnEmpty'=>false,'on'=>'update'),
+			array('time_sent','default', 'value'=>microtime(true), 'setOnEmpty'=>false,'on'=>'insert'),
 		);
 	}
 
@@ -113,6 +120,17 @@ class Crunches extends CActiveRecord
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+	
+	/**
+	 * Updates the model so it can check if the processing time has updated.
+	 */
+	protected function beforeSave(){
+		if($this->time_returned != '' && $this->time_sent != '' && $this->time_processing != ''){
+			$this->time_latency = ($this->time_returned - $this->time_sent) - $this->time_processing;
+		}
+		
+		return parent::beforeSave();
 	}
 	
 	/**
