@@ -30,15 +30,20 @@ $this->menu=array(
 
 <h2>Results</h2>
 
-<div id="testResults" class="loading">
-	<p>Test results are loading</p>
+<div id="testResults">
+	<p>Results are loading.</p>
 </div>
+
+<div id="results" style="display:none;">
+	<?php echo $results; ?>
+</div>
+
 
 <script>
 	var config = {
-		display_file: '<?php echo CHtml::encode($model->display_file); ?>',
-		results: JSON.parse('<?php echo $results; ?>'),
+		results: document.getElementById('results'),
 		wrapper: document.getElementById('testResults'),
 	};
 </script>
-<script src="/js/view.js"></script>
+
+<script src="<?php echo CHtml::encode($model->display_file); ?>"></script>
