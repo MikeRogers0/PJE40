@@ -37,7 +37,7 @@ class Tests extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('name, crunch_file, tbl_users_id', 'required'),
+			array('name, crunch_file', 'required'),
 			array('crunches_required, completed, tbl_users_id', 'numerical', 'integerOnly'=>true),
 			array('name, crunch_file, display_file', 'length', 'max'=>45),
 			array('last_crunched, description', 'safe'),
