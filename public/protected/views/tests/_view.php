@@ -48,7 +48,7 @@
 	if($data->completed == '1'){
 		echo CHtml::link('View Result',array('view','id'=>$data->id), array('class'=>'btn')); 
 	}else{
-		echo CHtml::link('Results Unavailable','#', array('class'=>'btn disabled')); 
+		echo CHtml::link('Task Unfinished',array('view','id'=>$data->id), array('class'=>'btn btn-danger')); 
 	}
 	?>
 </div>

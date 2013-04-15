@@ -41,7 +41,7 @@ $this->menu=array(
 
 <script>
 	var config = {
-		results: document.getElementById('results'),
+		results: JSON.parse(document.getElementById('results').innerHTML),
 		wrapper: document.getElementById('testResults'),
 	};
 </script>
