@@ -59,7 +59,7 @@ class Tests extends CActiveRecord
 			'crunches' => array(self::HAS_MANY, 'Crunches', 'tbl_tests_id'),
 			'completed_crunches' => array(self::HAS_MANY, 'Crunches', 'tbl_tests_id', 'condition'=>'completed=1', 'select'=>'*', 'group'=>'tbl_tests_id, crunch_number'),
 			'tblUsers' => array(self::BELONGS_TO, 'Users', 'tbl_users_id'),
-			'totalProcessingTime' => array(self::STAT, 'Crunches', 'tbl_tests_id', 'condition'=>'completed=1', 'select'=>'SUM(time_processing)'),
+			'totalProcessingTime' => array(self::STAT, 'Crunches', 'tbl_tests_id', 'condition'=>'completed=1', 'select'=>'SUM(time_processing)', 'group'=>'crunch_number'),
 			'avgLatencyTime' => array(self::STAT, 'Crunches', 'tbl_tests_id', 'condition'=>'completed=1', 'select'=>'AVG(time_latency)'),
 		);
 	}

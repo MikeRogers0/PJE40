@@ -46,8 +46,12 @@ io.sockets.on('connection', function (socket) {
 		
 		
 		// Save the data the user was working on.
-		db.query('UPDATE tbl_crunches SET result = ?, time_returned = ?, time_processing = ?, time_latency = ?, completed = 1 WHERE id = ?', [JSON.stringify(data.result), data.crunch.time_returned, data.crunch.time_processing, data.crunch.time_latency,  data.crunch.id], function(err, result){
+		db.query('UPDATE tbl_crunches SET result = ?, time_returned = ?, time_processing = ?, time_latency = ?, completed = 1 WHERE id = ?', [data.result, data.crunch.time_returned, data.crunch.time_processing, data.crunch.time_latency,  data.crunch.id], function(err, result){
 			// Update the parent to check if it's completed.
+			db.query(
+			'UPDATE tbl_tests SET tbl_tests.last_crunched = ? WHERE '+
+			'tbl_tests.id = '+db.escape(testID), [new Date()]);
+			
 			db.query(
 			'UPDATE tbl_tests SET tbl_tests.completed = 1 WHERE '+
 			'tbl_tests.id = '+db.escape(testID)+' AND tbl_tests.crunches_required = ('+
@@ -71,6 +75,15 @@ io.sockets.on('connection', function (socket) {
 		if(activeUsers[socket.id] != undefined){
 			// mark it as failed
 			
+			db.query('UPDATE tbl_crunches SET result = ?, completed = 3, fails = fails + 1 WHERE id = ?', [JSON.stringify(""),  activeUsers[socket.id].test_id], function(err, result){
+			// Update the parent to check if it's completed.
+			db.query(
+			'UPDATE tbl_tests SET tbl_tests.completed = 2 WHERE '+
+			'tbl_tests.id = '+db.escape(testID)+' AND ('+
+			'SELECT (sum(tbl_crunches.fails)) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+db.escape(testID)+' '+
+			') > 5');
+		});
+			
 			delete activeUsers[socket.id];
 		}
 		
@@ -81,6 +94,55 @@ io.sockets.on('connection', function (socket) {
 		}
 	});
 });
+
+/**
+ * Pull up a newly added/failed crunch and sent it to a user.
+ */
+function sentActiveUserTest(crunchID){
+	db.query(
+		'SELECT '+
+		'tbl_tests.id AS test_id, tbl_tests.name AS test_name, tbl_tests.crunch_file AS test_crunch_file, tbl_crunches.authkey AS crunch_authkey, tbl_crunches.id AS crunch_id, tbl_crunches.crunch_number AS crunch_crunch_number, tbl_crunches.time_sent AS crunch_time_sent '+
+		'FROM tbl_tests '+
+		'INNER JOIN '+
+		'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
+		'WHERE tbl_crunches.id = '+crunchID+' OR  tbl_crunches.completed = 3 '+
+		'LIMIT 0,1', 
+			function(err, crunchAndTest) {
+				if (err) throw err;
+				
+				console.log(crunchAndTest);
+				
+				for(var user in idleUsers){
+					// Remove user from idle users list to active.
+					activeUsers[user] = idleUsers[user]; 
+					delete idleUsers[user];
+					
+					// Convert the row result to a nice sexy object:
+					var SexyCrunch = {
+						test: {
+							id: crunchAndTest[0].test_id,
+							name: crunchAndTest[0].test_name,
+							crunch_file: crunchAndTest[0].test_crunch_file
+						},
+						crunch: {
+							authkey: crunchAndTest[0].crunch_authkey,
+							id: crunchAndTest[0].crunch_id,
+							crunch_number: crunchAndTest[0].crunch_crunch_number,
+							time_sent: crunchAndTest[0].crunch_time_sent,
+						}
+					}
+					
+					// Make a log of the task being done.
+					activeUsers[user].test_id = crunchAndTest[0].test_id;
+					
+					activeUsers[user].emit('taskReady', SexyCrunch);
+					
+					return;
+				}
+			});
+	//console.log(query.sql)
+}
+
 
 // Check if there is a task to send the user every minute
 function updateTasks(){
@@ -93,9 +155,9 @@ function updateTasks(){
 	//console.log('Total Ready Users: ', count_idleUsers);
 	
 	if(count_idleUsers >= 1){
-		// Do the SQL
+		// Do the SQL to find incomplete tests
 		db.query(
-			'SELECT tbl_tests.id, (COUNT(tbl_crunches.tbl_tests_id)) AS totalCrunches '+
+			'SELECT tbl_tests.id, (COUNT(tbl_crunches.tbl_tests_id)) AS totalCrunches, (COUNT(tbl_crunches.completed = 3)) AS failedCrunches '+
 			'FROM tbl_tests '+
 			'LEFT JOIN '+
 			'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
@@ -107,9 +169,11 @@ function updateTasks(){
 			
 			for(var row in rows){
 				//console.log(rows[row]);
-			
+				
+				
+				
 				// Make a crunch & Add it to the DB.
-				console.log('Adding in query ', rows[row]);
+				//console.log('Adding in query ', rows[row]);
 				db.query('INSERT INTO tbl_crunches SET ?', {
 					tbl_tests_id: rows[row].id, 
 					crunch_number: (rows[row].totalCrunches),
@@ -118,59 +182,12 @@ function updateTasks(){
 					last_activity: new Date()
 				}, function(err, result){
 					if (err) throw err;
-					//console.log(err, db, result);
 					
-					console.log(rows[row], result.insertId);
-					
-					// Pull up the newly added crunch.
-					query = db.query(
-						'SELECT '+
-						'tbl_tests.id AS test_id, tbl_tests.name AS test_name, tbl_tests.crunch_file AS test_crunch_file, tbl_crunches.authkey AS crunch_authkey, tbl_crunches.id AS crunch_id, tbl_crunches.crunch_number AS crunch_crunch_number, tbl_crunches.time_sent AS crunch_time_sent '+
-						'FROM tbl_tests '+
-						'INNER JOIN '+
-						'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
-						'WHERE tbl_crunches.id = '+result.insertId+' '+
-						'LIMIT 0,1', 
-							function(err, crunchAndTest) {
-								if (err) throw err;
-								
-								console.log(crunchAndTest);
-								
-								for(var user in idleUsers){
-									// Remove user from idle users list to active.
-									activeUsers[user] = idleUsers[user]; 
-									delete idleUsers[user];
-									
-									// Convert the row result to a nice sexy object:
-									var SexyCrunch = {
-										test: {
-											id: crunchAndTest[0].test_id,
-											name: crunchAndTest[0].test_name,
-											crunch_file: crunchAndTest[0].test_crunch_file
-										},
-										crunch: {
-											authkey: crunchAndTest[0].crunch_authkey,
-											id: crunchAndTest[0].crunch_id,
-											crunch_number: crunchAndTest[0].crunch_crunch_number,
-											time_sent: crunchAndTest[0].crunch_time_sent,
-										}
-									}
-									
-									activeUsers[user].emit('taskReady', SexyCrunch);
-									
-									return;
-								}
-							});
-					//console.log(query.sql)
-					
+					sentActiveUserTest(result.insertId);
 				});
 			}
 			
 		});
-		
-		// Anything not being processed, make a few crunches
-		
-		// Send them to users.
 	}
 	
 	setTimeout(updateTasks, 500);

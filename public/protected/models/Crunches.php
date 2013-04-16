@@ -15,6 +15,7 @@
  * @property double $time_returned
  * @property double $time_processing
  * @property double $time_latency
+ * @property integer $fails
  *
  * The followings are the available model relations:
  * @property Tests $tblTests
@@ -38,7 +39,7 @@ class Crunches extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('tbl_tests_id', 'required'),
-			array('tbl_tests_id, completed, crunch_number', 'numerical', 'integerOnly'=>true),
+			array('tbl_tests_id, completed, crunch_number, fails', 'numerical', 'integerOnly'=>true),
 			array('time_sent, time_returned, time_processing, time_latency', 'numerical'),
 			array('authkey', 'length', 'max'=>45),
 			array('last_activity, result', 'safe'),
