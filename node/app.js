@@ -161,7 +161,7 @@ function updateTasks(){
 	if(count_idleUsers >= 1){
 		// Do the SQL to find incomplete tests
 		db.query(
-			'SELECT tbl_tests.id, (COUNT(tbl_crunches.tbl_tests_id)) AS totalCrunches, (COUNT(tbl_crunches.completed = 3)) AS failedCrunches, tbl_crunches.id AS failedCrunch '+
+			'SELECT tbl_tests.id, (COUNT(tbl_crunches.tbl_tests_id)) AS totalCrunches, (SUM(tbl_crunches.completed = 3)) AS failedCrunches, tbl_crunches.id AS failedCrunch '+
 			'FROM tbl_tests '+
 			'LEFT JOIN '+
 			'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
