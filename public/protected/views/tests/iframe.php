@@ -1,7 +1,6 @@
 <!--
 	Load in the JS files which make this project run.
 -->
-<script src="http://pje40.local:1337/socket.io/socket.io.js"></script>
 </script>
 
 <pre id="debug">
@@ -15,12 +14,13 @@ var config = {
 	checkinDelay: 60,
 	testDelay: 500,
 	debug: <?php echo $debug; ?>,
-	domain: 'pje40.local',
+	domain: '<?php echo $_SERVER['SERVER_NAME']; ?>',
 	debugElm: document.getElementById('debug')
 };
 var app = {};
 var socket = {};
 </script>
+<script src="http://<?php echo $_SERVER['SERVER_NAME']; ?>:1337/socket.io/socket.io.js"></script>
 <script src="/js/embed.js"></script>
 
 
