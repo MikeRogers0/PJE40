@@ -47,8 +47,10 @@
 	<?php
 	if($data->completed == '1'){
 		echo CHtml::link('View Result',array('view','id'=>$data->id), array('class'=>'btn')); 
+	}elseif($data->completed == '2'){
+		echo CHtml::link('Task Failed',array('view','id'=>$data->id), array('class'=>'btn btn-danger')); 
 	}else{
-		echo CHtml::link('Task Unfinished',array('view','id'=>$data->id), array('class'=>'btn btn-danger')); 
+		echo CHtml::link('Task Unfinished',array('view','id'=>$data->id), array('class'=>'btn btn-warning')); 
 	}
 	?>
 </div>

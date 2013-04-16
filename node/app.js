@@ -75,14 +75,17 @@ io.sockets.on('connection', function (socket) {
 		if(activeUsers[socket.id] != undefined){
 			// mark it as failed
 			
-			db.query('UPDATE tbl_crunches SET result = ?, completed = 3, fails = fails + 1 WHERE id = ?', [JSON.stringify(""),  activeUsers[socket.id].test_id], function(err, result){
+			var crunchID = activeUsers[socket.id].crunch_id;
+			var testID = activeUsers[socket.id].test_id;
+			
+			db.query('UPDATE tbl_crunches SET result = ?, completed = 3, fails = fails + 1 WHERE id = ?', [JSON.stringify(""),  crunchID], function(err, result){
 			// Update the parent to check if it's completed.
-			db.query(
-			'UPDATE tbl_tests SET tbl_tests.completed = 2 WHERE '+
-			'tbl_tests.id = '+db.escape(testID)+' AND ('+
-			'SELECT (sum(tbl_crunches.fails)) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+db.escape(testID)+' '+
-			') > 5');
-		});
+				db.query(
+				'UPDATE tbl_tests SET tbl_tests.completed = 2 WHERE '+
+				'tbl_tests.id = '+testID+' AND ('+
+				'SELECT (sum(tbl_crunches.fails)) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+testID+' GROUP BY tbl_crunches.tbl_tests_id'+
+				') >= 10');
+			});
 			
 			delete activeUsers[socket.id];
 		}
@@ -134,6 +137,7 @@ function sentActiveUserTest(crunchID){
 					
 					// Make a log of the task being done.
 					activeUsers[user].test_id = crunchAndTest[0].test_id;
+					activeUsers[user].crunch_id = crunchAndTest[0].crunch_id;
 					
 					activeUsers[user].emit('taskReady', SexyCrunch);
 					
@@ -157,7 +161,7 @@ function updateTasks(){
 	if(count_idleUsers >= 1){
 		// Do the SQL to find incomplete tests
 		db.query(
-			'SELECT tbl_tests.id, (COUNT(tbl_crunches.tbl_tests_id)) AS totalCrunches, (COUNT(tbl_crunches.completed = 3)) AS failedCrunches '+
+			'SELECT tbl_tests.id, (COUNT(tbl_crunches.tbl_tests_id)) AS totalCrunches, (COUNT(tbl_crunches.completed = 3)) AS failedCrunches, tbl_crunches.id AS failedCrunch '+
 			'FROM tbl_tests '+
 			'LEFT JOIN '+
 			'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
@@ -167,24 +171,50 @@ function updateTasks(){
 		function(err, rows) {
 			if (err) throw err;
 			
+			// Loop through the results
 			for(var row in rows){
-				//console.log(rows[row]);
 				
-				
-				
-				// Make a crunch & Add it to the DB.
-				//console.log('Adding in query ', rows[row]);
-				db.query('INSERT INTO tbl_crunches SET ?', {
-					tbl_tests_id: rows[row].id, 
-					crunch_number: (rows[row].totalCrunches),
-					time_sent: microtime(true),
-					authkey: parseInt(Math.random() * 320000000),
-					last_activity: new Date()
-				}, function(err, result){
-					if (err) throw err;
+				// If their are failed tests, re-run them,
+				if(rows[row].failedCrunches >= 1){
 					
-					sentActiveUserTest(result.insertId);
-				});
+					console.log('sending updated test to: '+rows[row].id);
+					
+					// rows[row].id
+					
+					db.query('UPDATE tbl_crunches SET time_sent = ?, authkey = ?, last_activity = ?, completed = 0 WHERE tbl_tests_id = ? AND completed = 3 LIMIT 1', [
+						microtime(true),
+						parseInt(Math.random() * 320000000),
+						new Date(),
+						rows[row].id
+					], function(err){
+						if (err) throw err;
+						
+						var query = db.query('SELECT id FROM tbl_crunches WHERE tbl_tests_id = ? ORDER BY last_activity DESC LIMIT 0,1', [rows[row].id], function(err, reCrunched){
+							if (err) throw err;
+							
+							//console.log(query, reCrunched);
+							
+							sentActiveUserTest(reCrunched[0].id);
+						});
+					});
+					
+				}else{
+				
+					// Make a crunch & Add it to the DB.
+					//console.log('Adding in query ', rows[row]);
+					db.query('INSERT INTO tbl_crunches SET ?', {
+						tbl_tests_id: rows[row].id, 
+						crunch_number: (rows[row].totalCrunches),
+						time_sent: microtime(true),
+						authkey: parseInt(Math.random() * 320000000),
+						last_activity: new Date(),
+						fails: 0
+					}, function(err, result){
+						if (err) throw err;
+						
+						sentActiveUserTest(result.insertId);
+					});
+				}
 			}
 			
 		});
