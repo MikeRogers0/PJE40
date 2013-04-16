@@ -164,6 +164,11 @@ class Tests extends CActiveRecord
 		foreach($this->completed_crunches as $completed_crunches){
 			$results[$completed_crunches->crunch_number] = json_decode($completed_crunches->result);
 		}
+		
+		// Sometimes an exra one is pulled in. Changes from server to server
+		if(isset($results[$this->crunches_required])){
+			unset($results[$this->crunches_required]);
+		}
 	
 		return $results;
 	}
