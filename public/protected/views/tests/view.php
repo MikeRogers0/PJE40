@@ -26,6 +26,8 @@ $this->menu=array(
 	<li><?php echo CHtml::encode($model->getAttributeLabel('description')); ?>: <?php echo CHtml::encode($model->description); ?></li>
 	<li><?php echo CHtml::encode($model->getAttributeLabel('totalProcessingTime')); ?>: <?php echo CHtml::encode($model->totalProcessingTime); ?> Seconds</li>
 	<li><?php echo CHtml::encode($model->getAttributeLabel('avgLatencyTime')); ?>: <?php echo CHtml::encode($model->avgLatencyTime); ?> Seconds</li>
+	<li><?php echo CHtml::encode($model->getAttributeLabel('totalRunTime')); ?>: <?php echo $model->getTotalRunTime(); ?></li>
+	
 </ul>
 
 <h2>Results</h2>

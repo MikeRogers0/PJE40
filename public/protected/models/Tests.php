@@ -10,6 +10,7 @@
  * @property string $display_file
  * @property integer $crunches_required
  * @property string $last_crunched
+ * @property string $date_added
  * @property integer $completed
  * @property integer $tbl_users_id
  * @property string $description
@@ -44,6 +45,7 @@ class Tests extends CActiveRecord
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, name, crunch_file, display_file, crunches_required, last_crunched, completed, tbl_users_id', 'safe', 'on'=>'search'),
+			array('date_added','default', 'value'=>new CDbExpression('NOW()'), 'setOnEmpty'=>false,'on'=>'insert'),
 			array('last_crunched','default', 'value'=>new CDbExpression('NOW()'), 'setOnEmpty'=>false,'on'=>'update'),
 		);
 	}
@@ -59,7 +61,7 @@ class Tests extends CActiveRecord
 			'crunches' => array(self::HAS_MANY, 'Crunches', 'tbl_tests_id'),
 			'completed_crunches' => array(self::HAS_MANY, 'Crunches', 'tbl_tests_id', 'condition'=>'completed=1', 'select'=>'*', 'group'=>'tbl_tests_id, crunch_number'),
 			'tblUsers' => array(self::BELONGS_TO, 'Users', 'tbl_users_id'),
-			'totalProcessingTime' => array(self::STAT, 'Crunches', 'tbl_tests_id', 'condition'=>'completed=1', 'select'=>'SUM(time_processing)'),
+			'totalProcessingTime' => array(self::STAT, 'Crunches', 'tbl_tests_id', 'condition'=>'completed=1', 'select'=>'SUM(time_processing)', 'group'=>'crunch_number'),
 			'avgLatencyTime' => array(self::STAT, 'Crunches', 'tbl_tests_id', 'condition'=>'completed=1', 'select'=>'AVG(time_latency)'),
 		);
 	}
@@ -79,7 +81,8 @@ class Tests extends CActiveRecord
 			'completed' => 'Completed',
 			'tbl_users_id' => 'Tbl Users',
 			'description' => 'Description',
-			'totalProcessingTime' => 'Total Processing Time',
+			'totalProcessingTime' => 'Total Processing Time (In thread)',
+			'totalRunTime' => 'Total Running Time (Hours:Minutes:Seconds)',
 			'avgLatencyTime' => 'Average Latency Time',
 		);
 	}
@@ -154,7 +157,7 @@ class Tests extends CActiveRecord
 	 }
 	 
 	 /**
-	  *
+	  * Gets only completed crunches.
 	 */
 	public function getDistinctResults(){
 		$results = '';
@@ -163,5 +166,14 @@ class Tests extends CActiveRecord
 		}
 	
 		return $results;
+	}
+	
+	/**
+	 * Gets the total time it took to run the script.
+	 */
+	public function getTotalRunTime(){
+		$totalRunTime = strtotime($this->last_crunched) - strtotime($this->date_added);
+		
+		return gmdate("H:i:s", $totalRunTime);
 	}
 }
