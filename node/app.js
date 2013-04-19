@@ -222,6 +222,6 @@ function updateTasks(){
 		});
 	}
 	
-	setTimeout(updateTasks, (500 + (count_idleUsers * 250)));
+	setTimeout(updateTasks, (500 + (count_idleUsers * 500)));
 }
 setTimeout(updateTasks, 1000);
