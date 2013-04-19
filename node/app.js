@@ -79,12 +79,12 @@ io.sockets.on('connection', function (socket) {
 			var testID = activeUsers[socket.id].test_id;
 			
 			db.query('UPDATE tbl_crunches SET result = ?, completed = 3, fails = fails + 1 WHERE id = ?', [JSON.stringify(""),  crunchID], function(err, result){
-			// Update the parent to check if it's completed.
+			// Update the parent to mark it as failedure.
 				db.query(
 				'UPDATE tbl_tests SET tbl_tests.completed = 2 WHERE '+
 				'tbl_tests.id = '+testID+' AND ('+
 				'SELECT (sum(tbl_crunches.fails)) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+testID+' GROUP BY tbl_crunches.tbl_tests_id'+
-				') >= 10');
+				') >= 5');
 			});
 			
 			delete activeUsers[socket.id];
@@ -161,7 +161,7 @@ function updateTasks(){
 	if(count_idleUsers >= 1){
 		// Do the SQL to find incomplete tests
 		db.query(
-			'SELECT tbl_tests.id, (COUNT(tbl_crunches.tbl_tests_id)) AS totalCrunches, (SUM(tbl_crunches.completed = 3)) AS failedCrunches, tbl_crunches.id AS failedCrunch '+
+			'SELECT tbl_tests.id, tbl_tests.crunches_required, tbl_tests.crunches_required,  (COUNT(tbl_crunches.tbl_tests_id)) AS totalCrunches, (SUM(tbl_crunches.completed = 3)) AS failedCrunches, tbl_crunches.id AS failedCrunch '+
 			'FROM tbl_tests '+
 			'LEFT JOIN '+
 			'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
@@ -199,21 +199,23 @@ function updateTasks(){
 					});
 					
 				}else{
-				
-					// Make a crunch & Add it to the DB.
-					//console.log('Adding in query ', rows[row]);
-					db.query('INSERT INTO tbl_crunches SET ?', {
-						tbl_tests_id: rows[row].id, 
-						crunch_number: (rows[row].totalCrunches),
-						time_sent: microtime(true),
-						authkey: parseInt(Math.random() * 320000000),
-						last_activity: new Date(),
-						fails: 0
-					}, function(err, result){
-						if (err) throw err;
-						
-						sentActiveUserTest(result.insertId);
-					});
+					// Make sure we don't send a crunch we don't need the results for.
+					if(rows[row].totalCrunches < rows[row].crunches_required){
+						// Make a crunch & Add it to the DB.
+						//console.log('Adding in query ', rows[row]);
+						db.query('INSERT INTO tbl_crunches SET ?', {
+							tbl_tests_id: rows[row].id, 
+							crunch_number: (rows[row].totalCrunches),
+							time_sent: microtime(true),
+							authkey: parseInt(Math.random() * 320000000),
+							last_activity: new Date(),
+							fails: 0
+						}, function(err, result){
+							if (err) throw err;
+							
+							sentActiveUserTest(result.insertId);
+						});
+					}
 				}
 			}
 			

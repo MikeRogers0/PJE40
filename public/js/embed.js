@@ -24,6 +24,7 @@ function microtime(get_as_float){
 var pj40App = function(){
 	this.data = false;
 	this.worker = false;
+	this.taskHeartbeat = false;
 };
 
 /**
@@ -98,7 +99,20 @@ pj40App.prototype.openThread = function(){
 	this.worker.addEventListener('error', function(e){app.responseThread(e);}, false);
 	
 	this.worker.postMessage({'cmd': 'start', 'data': this.data});
+	
+	app.timeoutCheck();
 };
+
+/**
+ * Checks every 25 second that the task hasn't timed out.
+ */
+pj40App.prototype.timeoutCheck = function(){
+	/*if(this.data.crunch.crunch_started <= ){
+		
+	}
+	
+	this.taskHeartbeat = setTimeout(function(){app.timeoutCheck();}, 20000);*/
+}
 
 /**
  * Handle responses from the threads.
