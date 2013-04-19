@@ -79,12 +79,12 @@ io.sockets.on('connection', function (socket) {
 			var testID = activeUsers[socket.id].test_id;
 			
 			db.query('UPDATE tbl_crunches SET result = ?, completed = 3, fails = fails + 1 WHERE id = ?', [JSON.stringify(""),  crunchID], function(err, result){
-			// Update the parent to check if it's completed.
+			// Update the parent to mark it as failedure.
 				db.query(
 				'UPDATE tbl_tests SET tbl_tests.completed = 2 WHERE '+
 				'tbl_tests.id = '+testID+' AND ('+
 				'SELECT (sum(tbl_crunches.fails)) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+testID+' GROUP BY tbl_crunches.tbl_tests_id'+
-				') >= 10');
+				') >= 5');
 			});
 			
 			delete activeUsers[socket.id];

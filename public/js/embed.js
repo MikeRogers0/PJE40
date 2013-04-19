@@ -111,7 +111,7 @@ pj40App.prototype.timeoutCheck = function(){
 		
 	}
 	
-	this.taskHeartbeat = setTimeout(function(){app.timeoutCheck();}, 25000);*/
+	this.taskHeartbeat = setTimeout(function(){app.timeoutCheck();}, 20000);*/
 }
 
 /**
