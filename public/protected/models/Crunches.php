@@ -153,6 +153,9 @@ class Crunches extends CActiveRecord
 		$model->tbl_tests_id = $tests->id;
 		
 		// Decide on a suitable crunch number
+		if(count($tests->completed_crunches) >= $tests->crunches_required){
+			return false;
+		}
 		$model->crunch_number = count($tests->completed_crunches);
 		
 		$model->save();

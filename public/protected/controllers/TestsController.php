@@ -90,18 +90,21 @@ class TestsController extends Controller
 		if($tests){
 			$crunch = Crunches::newModel($tests);
 			
-			$json['status'] = 'true';
-			// Make the json object
-			$json['test'] = array(
-				'id' => $tests->id,
-				'name' => $tests->name,
-				'crunch_file' => $tests->crunch_file
-			);
-			$json['crunch'] = array(
-				'authkey' => $crunch->authkey,
-				'id' => $crunch->id,
-				'crunch_number' => $crunch->crunch_number
-			);
+			if($crunch != false){
+			
+				$json['status'] = 'true';
+				// Make the json object
+				$json['test'] = array(
+					'id' => $tests->id,
+					'name' => $tests->name,
+					'crunch_file' => $tests->crunch_file
+				);
+				$json['crunch'] = array(
+					'authkey' => $crunch->authkey,
+					'id' => $crunch->id,
+					'crunch_number' => $crunch->crunch_number
+				);
+			}
 		}
 		
 		
