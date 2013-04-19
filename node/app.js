@@ -55,7 +55,7 @@ io.sockets.on('connection', function (socket) {
 			db.query(
 			'UPDATE tbl_tests SET tbl_tests.completed = 1 WHERE '+
 			'tbl_tests.id = '+db.escape(testID)+' AND tbl_tests.crunches_required = ('+
-			'SELECT (COUNT(tbl_crunches.tbl_tests_id)) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+db.escape(testID)+' AND completed = 1'+
+			'SELECT (COUNT(DISTINCT tbl_crunches.tbl_tests_id)) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+db.escape(testID)+' AND completed = 1'+
 			')');
 		});
 		
@@ -161,7 +161,7 @@ function updateTasks(){
 	if(count_idleUsers >= 1){
 		// Do the SQL to find incomplete tests
 		db.query(
-			'SELECT tbl_tests.id, tbl_tests.crunches_required, tbl_tests.crunches_required,  (COUNT(tbl_crunches.tbl_tests_id)) AS totalCrunches, (SUM(tbl_crunches.completed = 3)) AS failedCrunches, tbl_crunches.id AS failedCrunch '+
+			'SELECT tbl_tests.id, tbl_tests.crunches_required, tbl_tests.crunches_required,  (COUNT(DISTINCT tbl_crunches.crunch_number)) AS totalCrunches, (SUM(tbl_crunches.completed = 3)) AS failedCrunches, tbl_crunches.id AS failedCrunch '+
 			'FROM tbl_tests '+
 			'LEFT JOIN '+
 			'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
