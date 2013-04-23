@@ -1,15 +1,14 @@
 <?php
 $this->breadcrumbs=array(
-	'Tests'=>array('index'),
+	'Tasks'=>array('index'),
 	'Create',
 );
 
 $this->menu=array(
-	array('label'=>'List Tests','url'=>array('index')),
-	array('label'=>'Manage Tests','url'=>array('admin')),
+	array('label'=>'List Tasks','url'=>array('index')),
 );
 ?>
 
-<h1>Create Tests</h1>
+<h1>Create Task</h1>
 
 <?php echo $this->renderPartial('_form', array('model'=>$model)); ?>

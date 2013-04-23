@@ -39,8 +39,15 @@
 	<h2><?php echo CHtml::encode($data->name); ?></h2>
 	<p><?php echo CHtml::encode($data->description); ?></p>
 	
-	<p><?php echo CHtml::encode($data->getAttributeLabel('last_crunched')); ?>: <?php echo CHtml::encode($data->last_crunched); ?></p>
-	<p>Total Crunches: <?php echo count($data->completed_crunches); ?> of <?php echo CHtml::encode($data->crunches_required); ?></p>
+	<p><?php echo CHtml::encode($data->getAttributeLabel('completed')); ?>: <?php 
+	if($data->completed === '0'){
+		echo 'Processing';
+	}elseif($data->completed === '1'){
+		echo 'Completed';
+	}else{
+		echo 'Failed';
+	}?></p>
+	
 	<div class="progress progress-striped">
 		<div class="bar" style="width:<?php echo (count($data->completed_crunches) / $data->crunches_required) * 100 ?>%;"></div>
 	</div>

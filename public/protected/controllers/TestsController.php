@@ -32,7 +32,7 @@ class TestsController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+				'actions'=>array('create','update', 'restart'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -136,6 +136,25 @@ class TestsController extends Controller
 		$this->render('ajax',array(
 			'json'=>json_encode($json), // convert the $model into some json which is nicer for Javascript to use.
 		));
+	}
+	
+	/**
+	 * Clears all the crunches data and restarts the test.
+	 */
+	public function actionRestart($id){
+		$model=Tests::model()->findByPk($id);
+		
+		$model->date_added = new CDbExpression('NOW()');
+		$model->completed = 0;
+		
+		foreach($model->crunches as $crunches){
+			$crunches->completed = 3; // Make the crunch as failed for retrail.
+			$crunches->result = json_encode("");
+			$crunches->save();
+		}
+		
+		if($model->save())
+				$this->redirect(array('view','id'=>$model->id));
 	}
 
 	/**

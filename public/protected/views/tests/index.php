@@ -1,15 +1,14 @@
 <?php
 $this->breadcrumbs=array(
-	'Tests',
+	'Tasks',
 );
 
 $this->menu=array(
-	array('label'=>'Create Tests','url'=>array('create')),
-	array('label'=>'Manage Tests','url'=>array('admin')),
+	array('label'=>'Create Task','url'=>array('create')),
 );
 ?>
 
-<h1>Tests</h1>
+<h1>Tasks</h1>
 
 <?php $this->widget('bootstrap.widgets.TbListView',array(
 	'dataProvider'=>$dataProvider,

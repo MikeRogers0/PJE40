@@ -1,6 +1,6 @@
 <?php
 $this->breadcrumbs=array(
-	'Tests'=>array('index'),
+	'Tasks'=>array('index'),
 	'Manage',
 );
 
@@ -23,7 +23,7 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<h1>Manage Tests</h1>
+<h1>Manage Tasks</h1>
 
 <?php /*<p>
 You may optionally enter a comparison operator (<b>&lt;</b>, <b>&lt;=</b>, <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;&gt;</b>

@@ -78,10 +78,10 @@ class Tests extends CActiveRecord
 			'display_file' => 'Display File',
 			'crunches_required' => 'Crunches Required',
 			'last_crunched' => 'Last Crunched',
-			'completed' => 'Completed',
+			'completed' => 'Status',
 			'tbl_users_id' => 'Tbl Users',
 			'description' => 'Description',
-			'totalProcessingTime' => 'Total Processing Time (In thread)',
+			'totalProcessingTime' => 'Total Processing Time (In Web Worker)',
 			'totalRunTime' => 'Total Running Time (Hours:Minutes:Seconds)',
 			'avgLatencyTime' => 'Average Latency Time',
 		);

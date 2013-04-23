@@ -1,18 +1,17 @@
 <?php
 $this->breadcrumbs=array(
-	'Tests'=>array('index'),
+	'Tasks'=>array('index'),
 	$model->name=>array('view','id'=>$model->id),
 	'Update',
 );
 
 $this->menu=array(
-	array('label'=>'List Tests','url'=>array('index')),
-	array('label'=>'Create Tests','url'=>array('create')),
-	array('label'=>'View Tests','url'=>array('view','id'=>$model->id)),
-	array('label'=>'Manage Tests','url'=>array('admin')),
+	array('label'=>'List Tasks','url'=>array('index')),
+	array('label'=>'Create Task','url'=>array('create')),
+	array('label'=>'View Task','url'=>array('view','id'=>$model->id)),
 );
 ?>
 
-<h1>Update Tests <?php echo $model->id; ?></h1>
+<h1>Update Task: <?php echo $model->id; ?></h1>
 
 <?php echo $this->renderPartial('_form',array('model'=>$model)); ?>
