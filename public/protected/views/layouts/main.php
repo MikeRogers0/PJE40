@@ -40,12 +40,9 @@ $this->widget('bootstrap.widgets.TbNavbar',
 				'class'=>'bootstrap.widgets.TbMenu',
 				'items'=>array(
 					array('label'=>'Home', 'url'=>'/'),
-					array('label'=>'Tests', 'url'=>array('/tests/')),
-					array('label'=>'API', 'url'=>array('/site/api')),
 					array('label'=>'About', 'url'=>array('/site/page', 'view'=>'about')),
-					array('label'=>'Contact', 'url'=>array('/site/contact')),
-					array('label'=>'Login', 'url'=>array('/site/login'), 'visible'=>Yii::app()->user->isGuest),
-					array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
+					array('label'=>'Tasks', 'url'=>array('/tests/')),
+					array('label'=>'Documentation', 'url'=>array('/site/api')),
 				)
 			)
 		)
@@ -64,7 +61,20 @@ $this->widget('bootstrap.widgets.TbNavbar',
 </div>
 
 <div id="footer">
-	<div class="container">	
+	<div class="container">
+		<?php
+		echo CHtml::link('Contact', array('/site/contact'));
+		echo ' - ';
+		if(Yii::app()->user->isGuest){
+			echo CHtml::link('Login', array('/site/login'));
+		}else {
+			echo CHtml::link('Logout ('.Yii::app()->user->name.')', array('/site/logout'));
+		}
+		
+		
+					
+		?>
+		<br />
 		PJE40 - 447955 Final Year Project<br/>
 		<?php echo Yii::powered(); ?>
 	</div>
