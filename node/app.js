@@ -95,7 +95,7 @@ function taskFailed(socket, disconnected){
 		crunchID = activeUsers[socket.id].crunch_id;
 		testID = activeUsers[socket.id].test_id;
 		
-		db.query('UPDATE tbl_crunches SET result = ?, completed = 3, fails = fails + 1 WHERE id = ?', [JSON.stringify(""),  crunchID], function(err, result){
+		db.query('UPDATE tbl_crunches SET result = ?, completed = 3, fails = fails + 1 WHERE id = ?', [JSON.stringify("Failed"),  crunchID], function(err, result){
 		// Update the parent to mark it as failedure.
 			db.query(
 			'UPDATE tbl_tests SET tbl_tests.completed = 2 WHERE '+
@@ -131,7 +131,7 @@ function sentActiveUserTest(crunchID){
 		'FROM tbl_tests '+
 		'INNER JOIN '+
 		'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
-		'WHERE tbl_crunches.id = '+crunchID+' OR  (tbl_crunches.completed = 3  AND tbl_crunches.fails <= 5)'+
+		'WHERE tbl_crunches.id = '+crunchID+' '+
 		'LIMIT 0,1', 
 			function(err, crunchAndTest) {
 				if (err) throw err;
@@ -193,7 +193,7 @@ function updateTasks(){
 			'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
 			'WHERE tbl_tests.completed = 0 '+
 			'GROUP BY  tbl_tests.id '+
-			'ORDER BY tbl_tests.last_crunched ASC LIMIT 0,'+count_idleUsers, 
+			'ORDER BY tbl_tests.last_crunched ASC LIMIT 0,1 ', 
 		function(err, rows) {
 			if (err) throw err;
 			
@@ -205,17 +205,19 @@ function updateTasks(){
 					
 					//console.log('sending updated test to: '+rows[row].id);
 					
+					var rowID = rows[row].id;
+					
 					// Reset the crunches timing data.
 					db.query('UPDATE tbl_crunches SET time_sent = ?, authkey = ?, last_activity = ?, completed = 0 WHERE tbl_tests_id = ? AND completed = 3 LIMIT 1', [
 						microtime(true),
 						parseInt(Math.random() * 320000000),
 						new Date(),
-						rows[row].id
+						rowID
 					], function(err){
 						if (err) throw err;
 						// Select the ID of the crunch we just updated...
 						// I did attempt to get the id from the previous look up, but it proved fruitless.
-						db.query('SELECT id FROM tbl_crunches WHERE tbl_tests_id = ? ORDER BY last_activity DESC LIMIT 0,1', [rows[row].id], function(err, reCrunched){
+						db.query('SELECT id FROM tbl_crunches WHERE tbl_tests_id = ? ORDER BY last_activity DESC LIMIT 0,1', [rowID], function(err, reCrunched){
 							if (err) throw err;
 							sentActiveUserTest(reCrunched[0].id);
 						});
@@ -246,6 +248,6 @@ function updateTasks(){
 		});
 	}
 	
-	setTimeout(updateTasks, (500 + (count_idleUsers * 500)));
+	setTimeout(updateTasks, (500));
 }
 setTimeout(updateTasks, 1000);
