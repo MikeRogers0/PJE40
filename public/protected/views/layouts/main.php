@@ -40,7 +40,6 @@ $this->widget('bootstrap.widgets.TbNavbar',
 				'class'=>'bootstrap.widgets.TbMenu',
 				'items'=>array(
 					array('label'=>'Home', 'url'=>'/'),
-					array('label'=>'About', 'url'=>array('/site/page', 'view'=>'about')),
 					array('label'=>'Tasks', 'url'=>array('/tests/')),
 					array('label'=>'Documentation', 'url'=>array('/site/api')),
 				)
@@ -63,6 +62,8 @@ $this->widget('bootstrap.widgets.TbNavbar',
 <div id="footer">
 	<div class="container">
 		<?php
+		echo CHtml::link('About', array('/site/page', 'view'=>'about'));
+		echo ' - ';
 		echo CHtml::link('Contact', array('/site/contact'));
 		echo ' - ';
 		if(Yii::app()->user->isGuest){

@@ -147,11 +147,7 @@ class TestsController extends Controller
 		$model->date_added = new CDbExpression('NOW()');
 		$model->completed = 0;
 		
-		foreach($model->crunches as $crunches){
-			$crunches->completed = 3; // Make the crunch as failed for retrail.
-			$crunches->result = json_encode("");
-			$crunches->save();
-		}
+		$model->resetCrunches();
 		
 		if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
