@@ -3,32 +3,39 @@
 /* @var $model Tests */
 
 $this->breadcrumbs=array(
-	'Tests'=>array('index'),
+	'Tasks'=>array('index'),
 	$model->name,
 );
 
 $this->menu=array(
-	array('label'=>'List Tests', 'url'=>array('index')),
-	array('label'=>'Create Tests', 'url'=>array('create')),
-	array('label'=>'Update Tests', 'url'=>array('update', 'id'=>$model->id)),
-	array('label'=>'Delete Tests', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->id),'confirm'=>'Are you sure you want to delete this item?')),
-	array('label'=>'Manage Tests', 'url'=>array('admin')),
+	array('label'=>'List Tasks', 'url'=>array('index')),
+	array('label'=>'Create Task', 'url'=>array('create')),
+	array('label'=>'Update Task', 'url'=>array('update', 'id'=>$model->id)),
+	array('label'=>'Delete Task', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->id),'confirm'=>'Are you sure you want to delete this item?')),
 );
 ?>
 
-<h1>View Test: <?php echo $model->name; ?></h1>
+<h1>View Task: <?php echo $model->name; ?></h1>
+
+<p><?php echo CHtml::encode($model->description); ?></p>
 
 <ul>
-	<li><?php echo CHtml::encode($model->getAttributeLabel('last_crunched')); ?>: <?php echo CHtml::encode($model->last_crunched); ?></li>
-	<li><?php echo CHtml::encode($model->getAttributeLabel('tbl_users_id')); ?>: <?php echo CHtml::encode($model->tbl_users_id); ?></li>
-	<li><?php echo CHtml::encode($model->getAttributeLabel('completed')); ?>: <?php echo CHtml::encode($model->completed); ?></li>
-	<li><?php echo CHtml::encode($model->getAttributeLabel('crunches_required')); ?>: <?php echo CHtml::encode($model->crunches_required); ?></li>
-	<li><?php echo CHtml::encode($model->getAttributeLabel('description')); ?>: <?php echo CHtml::encode($model->description); ?></li>
-	<li><?php echo CHtml::encode($model->getAttributeLabel('totalProcessingTime')); ?>: <?php echo CHtml::encode($model->totalProcessingTime); ?> Seconds</li>
-	<li><?php echo CHtml::encode($model->getAttributeLabel('avgLatencyTime')); ?>: <?php echo CHtml::encode($model->avgLatencyTime); ?> Seconds</li>
-	<li><?php echo CHtml::encode($model->getAttributeLabel('totalRunTime')); ?>: <?php echo $model->getTotalRunTime(); ?></li>
-	
+	<li><strong><?php echo CHtml::encode($model->getAttributeLabel('totalProcessingTime')); ?></strong>: <?php echo CHtml::encode($model->totalProcessingTime); ?> Seconds</li>
+	<li><strong><?php echo CHtml::encode($model->getAttributeLabel('avgLatencyTime')); ?></strong>: <?php echo CHtml::encode($model->avgLatencyTime); ?> Seconds</li>
+	<li><strong><?php echo CHtml::encode($model->getAttributeLabel('totalRunTime')); ?></strong>: <?php echo $model->getTotalRunTime(); ?></li>
+	<li><strong><?php echo CHtml::encode($model->getAttributeLabel('last_crunched')); ?></strong>: <?php echo CHtml::encode($model->last_crunched); ?></li>
+	<li><strong><?php echo CHtml::encode($model->getAttributeLabel('crunches_required')); ?></strong>: <?php echo CHtml::encode($model->crunches_required); ?></li>
+	<li><strong><?php echo CHtml::encode($model->getAttributeLabel('completed')); ?></strong>: <?php 
+	if($model->completed === '0'){
+		echo 'Processing';
+	}elseif($model->completed === '1'){
+		echo 'Completed';
+	}else{
+		echo 'Failed';
+	}?></li>
 </ul>
+
+<p><?php echo CHtml::link('Re-Run Task',array('restart','id'=>$model->id), array('class'=>'btn'));  ?></p>
 
 <h2>Results</h2>
 

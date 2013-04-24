@@ -118,6 +118,10 @@ return array(
 		),
 		'bootstrap'=>array(
             'class'=>'bootstrap.components.Bootstrap',
+            'coreCss'=>false,
+            'responsiveCss'=>false,
+            'yiiCss'=>false,
+            'enableJS'=>false
         ),
 	),
 

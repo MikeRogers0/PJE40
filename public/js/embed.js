@@ -62,10 +62,20 @@ pj40App.prototype.hasUnfinishedBusiness = function(){
  */
 pj40App.prototype.startSocket = function(){
 	// Connect to the socket.
-	socket = io.connect('http://'+config.domain+':1337');
+	try{
+		socket = io.connect('http://'+config.domain+':1337');
+	}catch(e){ // The server isn't active or somehting is broken.
+		// Reload the script in 15 seconds and try again.
+		debug('Error', 'Unable to connect to Node Server, will retry in 30 seconds.');
+		setTimeout(function(){
+			location.reload(true);
+		}, 30000)
+		return ;
+	}
+	
 	socket.emit('ready'); // Tell it were ready.
 	
-	debug('Socket', 'Connected')
+	debug('Socket', 'Awaiting tasks')
 	
 	if(this.hasUnfinishedBusiness()){
 		this.openThread();
@@ -100,18 +110,24 @@ pj40App.prototype.openThread = function(){
 	
 	this.worker.postMessage({'cmd': 'start', 'data': this.data});
 	
-	app.timeoutCheck();
+	this.timeout('start', 30000);
 };
 
 /**
  * Checks every 25 second that the task hasn't timed out.
  */
-pj40App.prototype.timeoutCheck = function(){
-	/*if(this.data.crunch.crunch_started <= ){
+pj40App.prototype.timeout = function(status, delay){
+	if(status == 'start'){
 		
+		// If a task takes 30 seconds ot finish, tell the nodeserver.
+		this.taskHeartbeat = setTimeout(function(){
+			debug('Error', 'Task failed. Getting new task.');
+			this.worker = null;
+			socket.emit('failed');
+		}, delay);
+		return;
 	}
-	
-	this.taskHeartbeat = setTimeout(function(){app.timeoutCheck();}, 20000);*/
+	clearTimeout(this.taskHeartbeat);
 }
 
 /**
@@ -131,6 +147,11 @@ pj40App.prototype.responseThread = function(e){
 		// close the worker and get a new test
 		
 		debug('Completed (From Thread)', e.data);
+		
+		// Clear the timeout, so the socket isn't borken.
+		this.timeout('clear');
+		this.worker = null;
+		
 		this.data.crunch.time_processing = (microtime(true) - this.data.crunch.crunch_started);
 		
 		socket.emit('save', {test: this.data.test, crunch: this.data.crunch, result: JSON.stringify(e.data.data)});

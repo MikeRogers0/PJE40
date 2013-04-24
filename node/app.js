@@ -2,6 +2,8 @@
 var 
 	// MySQL is the DB on the server. Library is https://github.com/felixge/node-mysql 
 	mysql = require('mysql'),
+	
+	// Set up the MySQL DB connection.
 	db = mysql.createConnection({
 		host     : 'localhost',
 		user     : 'pje40',
@@ -10,12 +12,13 @@ var
 	}),
 	
 	// The Socket.io libary from http://socket.io/
-	io = require('socket.io').listen(1337),
+	io = require('socket.io').listen(1337, { log: false }),
 	
 	// List of users ready for tests
 	idleUsers = {},
 	activeUsers = {};
-	
+
+// Connect to the database.
 db.connect();
 
 /**
@@ -28,22 +31,23 @@ function microtime(get_as_float){
     return get_as_float ? (unixtime_ms/1000) : (unixtime_ms - (sec * 1000))/1000 + ' ' + sec;
 }
 
-io.sockets.on('connection', function (socket) { 
+// Set up a list of call backs when the server recives a socket connection
+io.sockets.on('connection', function (socket) {
+
 	// When the user is ready to recieve a test
 	socket.on('ready', function () {
 		console.log(socket.id + ' Ready');
 		idleUsers[socket.id] = socket;
 	});
 	
+	// When a user has completed a task.
 	socket.on('save', function (data) {
-		console.log(socket.id + ' Save', data);
+		console.log(socket.id + ' Save');
 		
 		var testID = data.test.id;
 		
 		data.crunch.time_returned = microtime(true);
 		data.crunch.time_latency = (data.crunch.time_returned - data.crunch.time_sent) - data.crunch.time_processing;
-		
-		
 		
 		// Save the data the user was working on.
 		db.query('UPDATE tbl_crunches SET result = ?, time_returned = ?, time_processing = ?, time_latency = ?, completed = 1 WHERE id = ?', [data.result, data.crunch.time_returned, data.crunch.time_processing, data.crunch.time_latency,  data.crunch.id], function(err, result){
@@ -54,12 +58,10 @@ io.sockets.on('connection', function (socket) {
 			
 			db.query(
 			'UPDATE tbl_tests SET tbl_tests.completed = 1 WHERE '+
-			'tbl_tests.id = '+db.escape(testID)+' AND tbl_tests.crunches_required = ('+
+			'tbl_tests.id = '+db.escape(testID)+' AND (tbl_tests.crunches_required) = ('+
 			'SELECT (COUNT(DISTINCT tbl_crunches.crunch_number)) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+db.escape(testID)+' AND completed = 1'+
 			')');
 		});
-		
-		
 		
 		
 		// Set the user as idle.
@@ -71,50 +73,70 @@ io.sockets.on('connection', function (socket) {
 	socket.on('disconnect', function () {
 		console.log(socket.id + ' Disconnected');
 	
-		// If a user was working on something, mark it as failed.
-		if(activeUsers[socket.id] != undefined){
-			// mark it as failed
-			
-			var crunchID = activeUsers[socket.id].crunch_id;
-			var testID = activeUsers[socket.id].test_id;
-			
-			db.query('UPDATE tbl_crunches SET result = ?, completed = 3, fails = fails + 1 WHERE id = ?', [JSON.stringify(""),  crunchID], function(err, result){
-			// Update the parent to mark it as failedure.
-				db.query(
-				'UPDATE tbl_tests SET tbl_tests.completed = 2 WHERE '+
-				'tbl_tests.id = '+testID+' AND ('+
-				'SELECT (sum(tbl_crunches.fails)) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+testID+' GROUP BY tbl_crunches.tbl_tests_id'+
-				') >= 5');
-			});
-			
-			delete activeUsers[socket.id];
-		}
-		
-		// If the user is not working on anything and leaves, it's ok.
-		if(idleUsers[socket.id] != undefined){
-			delete idleUsers[socket.id];
-			return;
-		}
+		taskFailed(socket, true);
+	});
+	
+	// When a task fails.
+	socket.on('failed', function () {
+		console.log(socket.id + ' Failed');
+	
+		taskFailed(socket, false);
 	});
 });
+
+/**
+ * Mark a test as failed.
+ */
+function taskFailed(socket, disconnected){
+	// If a user was working on something, mark it as failed.
+	if(activeUsers[socket.id] != undefined){
+		// mark it as failed
+		
+		crunchID = activeUsers[socket.id].crunch_id;
+		testID = activeUsers[socket.id].test_id;
+		
+		db.query('UPDATE tbl_crunches SET result = ?, completed = 3, fails = fails + 1 WHERE id = ?', [JSON.stringify(""),  crunchID], function(err, result){
+		// Update the parent to mark it as failedure.
+			db.query(
+			'UPDATE tbl_tests SET tbl_tests.completed = 2 WHERE '+
+			'tbl_tests.id = '+testID+' AND ('+
+			'SELECT (sum(tbl_crunches.fails)) FROM tbl_crunches WHERE tbl_crunches.tbl_tests_id = '+testID+' GROUP BY tbl_crunches.tbl_tests_id'+
+			') >= 5');
+		});
+		
+		delete activeUsers[socket.id];
+	}
+	
+	if(idleUsers[socket.id] == undefined && disconnected == false){
+		idleUsers[socket.id] = socket;
+		return;
+	}
+	
+	// If the user is not working on anything and leaves, it's ok.
+	if(idleUsers[socket.id] != undefined){
+		delete idleUsers[socket.id];
+		return;
+	}
+}
 
 /**
  * Pull up a newly added/failed crunch and sent it to a user.
  */
 function sentActiveUserTest(crunchID){
-	db.query(
+	
+	// Select the crunch from the database.
+	var query = db.query(
 		'SELECT '+
 		'tbl_tests.id AS test_id, tbl_tests.name AS test_name, tbl_tests.crunch_file AS test_crunch_file, tbl_crunches.authkey AS crunch_authkey, tbl_crunches.id AS crunch_id, tbl_crunches.crunch_number AS crunch_crunch_number, tbl_crunches.time_sent AS crunch_time_sent '+
 		'FROM tbl_tests '+
 		'INNER JOIN '+
 		'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
-		'WHERE tbl_crunches.id = '+crunchID+' OR  tbl_crunches.completed = 3 '+
+		'WHERE tbl_crunches.id = '+crunchID+' OR  (tbl_crunches.completed = 3  AND tbl_crunches.fails <= 5)'+
 		'LIMIT 0,1', 
 			function(err, crunchAndTest) {
 				if (err) throw err;
 				
-				console.log(crunchAndTest);
-				
+				// Send the crunch we have to the first idle user.
 				for(var user in idleUsers){
 					// Remove user from idle users list to active.
 					activeUsers[user] = idleUsers[user]; 
@@ -144,11 +166,15 @@ function sentActiveUserTest(crunchID){
 					return;
 				}
 			});
-	//console.log(query.sql)
 }
 
 
-// Check if there is a task to send the user every minute
+/**
+ * This neat function checks if there are users we can send crunches to.
+ * If there are, selects an unfinished task
+ * then either creates a new crunch in it, or uses a previously failed one
+ * Then asks the user to complete it.
+ */
 function updateTasks(){
 	var count_idleUsers = 0;
 	
@@ -156,7 +182,7 @@ function updateTasks(){
 		count_idleUsers++;
 	}
 	
-	//console.log('Total Ready Users: ', count_idleUsers);
+	//console.log('Total Idle Users: ', count_idleUsers);
 	
 	if(count_idleUsers >= 1){
 		// Do the SQL to find incomplete tests
@@ -177,10 +203,9 @@ function updateTasks(){
 				// If their are failed tests, re-run them,
 				if(rows[row].failedCrunches >= 1){
 					
-					console.log('sending updated test to: '+rows[row].id);
+					//console.log('sending updated test to: '+rows[row].id);
 					
-					// rows[row].id
-					
+					// Reset the crunches timing data.
 					db.query('UPDATE tbl_crunches SET time_sent = ?, authkey = ?, last_activity = ?, completed = 0 WHERE tbl_tests_id = ? AND completed = 3 LIMIT 1', [
 						microtime(true),
 						parseInt(Math.random() * 320000000),
@@ -188,12 +213,10 @@ function updateTasks(){
 						rows[row].id
 					], function(err){
 						if (err) throw err;
-						
-						var query = db.query('SELECT id FROM tbl_crunches WHERE tbl_tests_id = ? ORDER BY last_activity DESC LIMIT 0,1', [rows[row].id], function(err, reCrunched){
+						// Select the ID of the crunch we just updated...
+						// I did attempt to get the id from the previous look up, but it proved fruitless.
+						db.query('SELECT id FROM tbl_crunches WHERE tbl_tests_id = ? ORDER BY last_activity DESC LIMIT 0,1', [rows[row].id], function(err, reCrunched){
 							if (err) throw err;
-							
-							//console.log(query, reCrunched);
-							
 							sentActiveUserTest(reCrunched[0].id);
 						});
 					});
@@ -203,6 +226,7 @@ function updateTasks(){
 					if(rows[row].totalCrunches < rows[row].crunches_required){
 						// Make a crunch & Add it to the DB.
 						//console.log('Adding in query ', rows[row]);
+						
 						db.query('INSERT INTO tbl_crunches SET ?', {
 							tbl_tests_id: rows[row].id, 
 							crunch_number: (rows[row].totalCrunches),

@@ -78,10 +78,10 @@ class Tests extends CActiveRecord
 			'display_file' => 'Display File',
 			'crunches_required' => 'Crunches Required',
 			'last_crunched' => 'Last Crunched',
-			'completed' => 'Completed',
+			'completed' => 'Status',
 			'tbl_users_id' => 'Tbl Users',
 			'description' => 'Description',
-			'totalProcessingTime' => 'Total Processing Time (In thread)',
+			'totalProcessingTime' => 'Total Processing Time (In Web Worker)',
 			'totalRunTime' => 'Total Running Time (Hours:Minutes:Seconds)',
 			'avgLatencyTime' => 'Average Latency Time',
 		);
@@ -168,6 +168,13 @@ class Tests extends CActiveRecord
 		}
 	
 		return $results;
+	}
+	
+	/**
+	 * Reset all this models crunches
+	 */
+	public function resetCrunches(){
+		Crunches::model()->updateAll(array('completed'=>3, 'result'=>json_encode(''), 'fails'=>0),'tbl_tests_id = :tbl_tests_id', array('tbl_tests_id'=>$this->id));
 	}
 	
 	/**
