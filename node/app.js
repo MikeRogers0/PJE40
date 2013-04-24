@@ -193,7 +193,7 @@ function updateTasks(){
 			'tbl_crunches ON tbl_tests.id = tbl_crunches.tbl_tests_id '+
 			'WHERE tbl_tests.completed = 0 '+
 			'GROUP BY  tbl_tests.id '+
-			'ORDER BY tbl_tests.last_crunched ASC LIMIT 0,1 ', 
+			'ORDER BY tbl_tests.last_crunched ASC LIMIT 0,'+count_idleUsers, 
 		function(err, rows) {
 			if (err) throw err;
 			
