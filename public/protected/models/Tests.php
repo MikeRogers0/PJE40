@@ -174,7 +174,7 @@ class Tests extends CActiveRecord
 	 * Reset all this models crunches
 	 */
 	public function resetCrunches(){
-		Crunches::model()->updateAll(array('completed'=>3, 'result'=>json_encode(''), 'fails'=>0),'tbl_tests_id = :tbl_tests_id', array('tbl_tests_id'=>$this->id));
+		Crunches::model()->deleteAll('tbl_tests_id = :tbl_tests_id', array('tbl_tests_id'=>$this->id));
 	}
 	
 	/**
